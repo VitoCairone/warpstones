@@ -48,7 +48,7 @@ var Game = new function () {
     motesPerRound: 7,
     render: false,
     painter: null,
-    clock: clocks.normal
+    clock: clocks.fast
   };
 
   this.begin = function () {

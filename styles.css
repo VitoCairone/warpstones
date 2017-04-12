@@ -264,25 +264,25 @@ body {
 #player-element-13 {
   position: absolute;
   top: 120px;
-  left: 92px;
+  right: 92px;
 }
 
 #player-element-14 {
   position: absolute;
   top: 120px;
-  left: 70px;
+  right: 70px;
 }
 
 #player-element-15 {
   position: absolute;
   top: 160px;
-  left: 92px;
+  right: 92px;
 }
 
 #player-element-16 {
   position: absolute;
   top: 160px;
-  left: 70px;
+  right: 70px;
 }
 
 .sprite {
