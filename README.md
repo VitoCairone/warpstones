@@ -32,6 +32,6 @@ The deck is made of 52 cards: 7 each of 7 elements, plus 2 void and 1 gold (chan
 
 The players who win the showdown are then able to cast a spell. Casting spells serves the ultimate goal of KOing opponents. The match is won when all players on the enemy team are KOd.
 
-A player who is KOd continues to be able to wager and win mana as normal. However, they have a different set of spells. One spell, costing 100 mana
+A player who is KOd continues to be able to wager and win mana as normal. However, they have a different set of spells. Any ghosts can cast Revive for a large amount of mana, returning them to their normal character.
 
 (to be continued)
