@@ -113,6 +113,11 @@ var Game = new function () {
     var player = game.players[pNum];
 
     if (player.betCount >= 7 || player.folded || player.allIn || player.motes.length == 0) {
+      // var hax = 8 * (player.betCount >= 7) +
+      //   4 * (player.folded) + 
+      //   2 * (player.allIn) + 
+      //   (player.motes.length == 0);
+      // alert("can't bet because: " + hax);
       return 0;
     }
 
@@ -151,6 +156,10 @@ var Game = new function () {
   function decideBets(pNum) {
     // in this stub, pNum is actually unused
     return Math.floor(Math.random() * 9) - 2;
+  }
+
+  function endSpellCastingStage() {
+    advanceStage();
   }
 
   function endBetStage() { 
@@ -313,6 +322,7 @@ var Game = new function () {
 
     if (game.render) {
       game.painter.animateBetTimerBar();
+      Magnetic.resetMaxMarked();
     }
 
     for (var i = 1; i <= 8; i++) {
@@ -322,6 +332,10 @@ var Game = new function () {
       }
       player.thisStageBet = 0;
       player.betCount = 0;
+    }
+
+    var betByXFn = function (x) {
+      return bet.bind(null, x);
     }
 
     // skip player 1; let interface control
@@ -337,7 +351,7 @@ var Game = new function () {
         }
       } else if (bets > 0) {
         for (var j = 0; j < bets; j++) {
-          bet(i);
+          window.setTimeout(betByXFn(i), Math.random() * game.clock.betStage * 0.9);
         }
       }
     }
@@ -545,13 +559,6 @@ var Game = new function () {
 
     console.log("Total mana before casting = " + totalMana());
 
-    // if (winners.indexOf(1) > -1) {
-    //   botSpellCasting();
-    //   triggerByClock(timeoutSpellLock, game.clock.spellLocking)
-    // } else {
-    //   botSpellCasting();
-    // }
-
     // when rendering, the strike is DELAYED by the time for
     // the animation to complete, so behavior here is async!!
 
@@ -559,13 +566,7 @@ var Game = new function () {
 
     console.log("Total mana after casting = " + totalMana());
 
-    // not proper async design
-    updateHealthReadout();
-
-    // not proper async design
-    if (!detectWinCondition()) {
-      triggerByClock(advanceStage, game.clock.spellCasting);
-    }
+    triggerByClock(endSpellCastingStage, game.clock.spellCasting);
   }
 
   function timeoutSpellLock() {
@@ -643,6 +644,10 @@ var Game = new function () {
     return score;
   }
 
+  function getPlayerStat(player, stat) {
+    return 0;
+  }
+
   function checkForFaint(pNum) {
     var player = game.players[pNum];
     if (player.hp <= 0 && !player.ghost) {
@@ -716,10 +721,21 @@ var Game = new function () {
     var player = game.players[pNum];
     var target = game.players[targNum];
 
-    var dam = Math.ceil(baseDamageMod * moteSpend);
+    var dam = baseDamageMod * moteSpend;
+
     if (target.ghost) {
       dam = 0;
+    } else {
+      var power = getPlayerStat(player, 'power');
+      var defence = getPlayerStat(target, 'defence');
+      if (target.folded) {
+        defence += 49;
+      }
+      var statsMod = (100 + power) / (100 + defence);
+      dam *= statsMod;
     }
+
+    dam = Math.round(dam);
 
     target.hp -= dam;
 

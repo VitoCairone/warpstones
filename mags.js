@@ -11,8 +11,12 @@ Magnetic = new function() {
   // console.log('SCREEN_HEIGHT is ' + SCREEN_HEIGHT);
   
   var MAGNETS_AT_START = 8;
-  var PARTICLES_PER_MAGNET = 28 - 7;
+  var PARTICLES_PER_MAGNET = 21 - 7;
   var MAGNETIC_FORCE_THRESHOLD = 300;
+
+  var LOW_ORBIT = 4;
+  var NORMAL_ORBIT = 7;
+  var HIGH_ORBIT = 11;
 
   var canvas;
   var context;
@@ -20,6 +24,7 @@ Magnetic = new function() {
   var magnets = [];
 
   var nextParticleId = 0;
+  var maxMarkedParticles = 0;
   
   var mouseX = (window.innerWidth - SCREEN_WIDTH);
   var mouseY = (window.innerHeight - SCREEN_HEIGHT);
@@ -61,11 +66,11 @@ Magnetic = new function() {
   }
 
   this.contractParticles = function (magnetIdx) {
-    magnets[magnetIdx].orbit = 5;
+    magnets[magnetIdx].orbit = LOW_ORBIT;
   }
 
   this.expandParticles = function (magnetIdx) {
-    magnets[magnetIdx].orbit = 10;
+    magnets[magnetIdx].orbit = NORMAL_ORBIT;
   }
 
   this.hiliteMagnetParticle = function (magnetIdx) {
@@ -75,13 +80,25 @@ Magnetic = new function() {
       return;
     }
     magnet.markedParticles += 1;
+    magnet.particles[particleIdx].betGlowFrames = 30;
     magnet.particles[particleIdx].innerColorStop = 'rgba(256,0,0,1.0)';
+    if (magnet.markedParticles > maxMarkedParticles) {
+      maxMarkedParticles = magnet.markedParticles;
+    }
   }
 
   this.unhiliteAllParticles = function () {
-    for (var i = 0; i < particles.length; i++) {
-      particles[i].innerColorStop = 'rgba(0,0,256,1.0)';
+    for (var i = 0; i < magnets.length; i++) {
+      magnets[i].markedParticles = 0;
     }
+    for (var i = 0; i < particles.length; i++) {
+      particles[i].innerColorStop = 'rgba(256,256,256,1.0)';
+    }
+    maxMarkedParticles = 0;
+  }
+
+  this.resetMaxMarked = function () {
+    maxMarkedParticles = 0;
   }
 
   this.transferMarkedParticles = function (from, to) {
@@ -223,81 +240,120 @@ Magnetic = new function() {
     for( j = 0, jlen = magnets.length; j < jlen; j++ ) {
       magnet = magnets[j];
       
-      // Increase the size of the magnet center point depending on # of connections
-      // magnet.size += ( (magnet.connections/3) - magnet.size ) * 0.025;
-      // magnet.size = Math.max(magnet.size,2);
-      
-      // var gradientFill = context.createRadialGradient(magnet.position.x,magnet.position.y,0,magnet.position.x,magnet.position.y,magnet.size*10);
-      // gradientFill.addColorStop(0,skins[skinIndex].glowA);
-      // gradientFill.addColorStop(1,skins[skinIndex].glowB);
-      
-      // context.beginPath();
-      // context.fillStyle = gradientFill;
-      // context.arc(magnet.position.x, magnet.position.y, magnet.size*10, 0, Math.PI*2, true);
-      // context.fill();
-      
-      // context.beginPath();
-      // context.fillStyle = '#00000000';
-      // context.arc(magnet.position.x, magnet.position.y, magnet.size, 0, Math.PI*2, true);
-      // context.fill();
-      
-      magnet.connections = 0;
-    }
-    
-    // Render the particles
-    for (i = 0, ilen = particles.length; i < ilen; i++) {
-      particle = particles[i];
-      
-      var force = { x: 0, y: 0 };
-      
-      if (particle.magnet != null) {
+      // Render the particles
+      for (i = 0, ilen = magnet.particles.length; i < ilen; i++) {
+        particle = magnet.particles[i];
         
-        magnet = particle.magnet;
-
-        var fx = magnet.position.x - particle.position.x;
-        // if( fx > -MAGNETIC_FORCE_THRESHOLD && fx < MAGNETIC_FORCE_THRESHOLD ) {
-          force.x += fx / MAGNETIC_FORCE_THRESHOLD;
-        // }
+        var force = { x: 0, y: 0 };
         
-        var fy = magnet.position.y - particle.position.y;
-        // if( fy > -MAGNETIC_FORCE_THRESHOLD && fy < MAGNETIC_FORCE_THRESHOLD ) {
-          force.y += fy / MAGNETIC_FORCE_THRESHOLD;
-        // }
+        if (particle.magnet != null) {
+          
+          // magnet = particle.magnet;
 
-      }
-      
-      // Rotation
-      particle.angle += particle.speed;
-      
-      // Translate towards the magnet position
-      particle.shift.x += (particle.magnet.position.x - particle.shift.x) * particle.speed;
-      particle.shift.y += (particle.magnet.position.y - particle.shift.y) * particle.speed;
-      
-      // Appy the combined position including shift, angle and orbit
-      particle.position.x = particle.shift.x + Math.cos(i+particle.angle) * (particle.orbit*particle.force);
-      particle.position.y = particle.shift.y + Math.sin(i+particle.angle) * (particle.orbit*particle.force);
-      
-      // Limit to screen bounds
-      particle.position.x = Math.max( Math.min( particle.position.x, SCREEN_WIDTH-particle.size/2 ), particle.size/2 );
-      particle.position.y = Math.max( Math.min( particle.position.y, SCREEN_HEIGHT-particle.size/2 ), particle.size/2 );
-      
-      // Slowly inherit the cloest magnets orbit
-      particle.orbit += ( particle.magnet.orbit - particle.orbit ) * 0.1;
-      
-      var glowRad = particle.size * 1.5;
-      var gradientFill = context.createRadialGradient(particle.position.x,particle.position.y,0,particle.position.x,particle.position.y,glowRad);
-      gradientFill.addColorStop(0, particle.innerColorStop);
-      gradientFill.addColorStop(1, 'rgba(0,0,256,0.0)');
-      
-      context.beginPath();
-      context.fillStyle = gradientFill;
-      context.arc(particle.position.x, particle.position.y, glowRad, 0, Math.PI*2, true);
-      context.fill();
-      
-      context.beginPath();
-      context.fillStyle = '#ffffff';
-      context.arc(particle.position.x, particle.position.y, particle.size/2, 0, Math.PI*2, true);
-      context.fill();
+          var fx = magnet.position.x - particle.position.x;
+          // if( fx > -MAGNETIC_FORCE_THRESHOLD && fx < MAGNETIC_FORCE_THRESHOLD ) {
+            force.x += fx / MAGNETIC_FORCE_THRESHOLD;
+          // }
+          
+          var fy = magnet.position.y - particle.position.y;
+          // if( fy > -MAGNETIC_FORCE_THRESHOLD && fy < MAGNETIC_FORCE_THRESHOLD ) {
+            force.y += fy / MAGNETIC_FORCE_THRESHOLD;
+          // }
+
+        }
+
+        var orbitPush = 1;
+        if (j == 0) {
+          // who once where high shall now be low
+          orbitPush = 1.0 - (particle.force - 2.1) * 2;
+        } else if (magnet.orbit > LOW_ORBIT && i < maxMarkedParticles) {
+          // render a higher orbit for particles below the max wager
+          orbitPush = HIGH_ORBIT / NORMAL_ORBIT;
+        }
+        
+        // Rotation
+        particle.angle += particle.speed;
+        
+        // Translate towards the magnet position
+        particle.shift.x += (particle.magnet.position.x - particle.shift.x) * particle.speed;
+        particle.shift.y += (particle.magnet.position.y - particle.shift.y) * particle.speed;
+        
+        // Appy the combined position including shift, angle and orbit
+        particle.position.x = particle.shift.x + Math.cos(i+particle.angle) * (particle.orbit*particle.force*orbitPush);
+        particle.position.y = particle.shift.y + Math.sin(i+particle.angle) * (particle.orbit*particle.force*orbitPush);
+        
+        // Limit to screen bounds
+        particle.position.x = Math.max( Math.min( particle.position.x, SCREEN_WIDTH-particle.size/2 ), particle.size/2 );
+        particle.position.y = Math.max( Math.min( particle.position.y, SCREEN_HEIGHT-particle.size/2 ), particle.size/2 );
+        
+        // Slowly inherit the closest magnets orbit
+        particle.orbit += ( particle.magnet.orbit - particle.orbit ) * 0.1;
+
+        if (particle.betGlowFrames != 0) {
+
+          var glowRad = particle.size * 3 + particle.betGlowFrames * 0.1;
+
+          var gradientFill = context.createRadialGradient(particle.position.x,particle.position.y,0,particle.position.x,particle.position.y,glowRad);
+          gradientFill.addColorStop(0, particle.innerColorStop);
+          gradientFill.addColorStop(1, 'rgba(230,230,0,0.0)');
+        
+          context.beginPath();
+          context.fillStyle = gradientFill;
+          context.arc(particle.position.x, particle.position.y, glowRad, 0, Math.PI*2, true);
+          context.fill();
+        
+          context.beginPath();
+          context.fillStyle = '#ffffff';
+          context.arc(particle.position.x, particle.position.y, particle.size/2, 0, Math.PI*2, true);
+          context.fill(); 
+
+          if (particle.betGlowFrames > 0) {
+            particle.betGlowFrames--;
+            if (particle.betGlowFrames == 0) {
+              particle.betGlowFrames = -30;
+            }
+          } else {
+            particle.betGlowFrames++;
+          }
+
+        } else if (j > 0 && i > magnet.markedParticles && i < maxMarkedParticles) {
+          // these are unmatched particles
+
+          var glowRad = particle.size * 2;
+          var gradientFill = context.createRadialGradient(particle.position.x,particle.position.y,0,particle.position.x,particle.position.y,glowRad);
+          gradientFill.addColorStop(0, particle.innerColorStop);
+          gradientFill.addColorStop(1, 'rgba(0,0,256,0.0)');
+        
+          context.beginPath();
+          context.fillStyle = gradientFill;
+          context.arc(particle.position.x, particle.position.y, glowRad, 0, Math.PI*2, true);
+          context.fill();
+        
+          context.beginPath();
+          context.fillStyle = '#ffffff'; //'#000000';
+          context.arc(particle.position.x, particle.position.y, particle.size/2, 0, Math.PI*2, true);
+          context.fill();
+
+        } else {
+
+          var glowRad = particle.size * 1.5;
+          var gradientFill = context.createRadialGradient(particle.position.x,particle.position.y,0,particle.position.x,particle.position.y,glowRad);
+          gradientFill.addColorStop(0, particle.innerColorStop);
+          gradientFill.addColorStop(1, 'rgba(0,0,256,0.0)');
+        
+          context.beginPath();
+          context.fillStyle = gradientFill;
+          context.arc(particle.position.x, particle.position.y, glowRad, 0, Math.PI*2, true);
+          context.fill();
+        
+          context.beginPath();
+          context.fillStyle = '#ffffff';
+          context.arc(particle.position.x, particle.position.y, particle.size/2, 0, Math.PI*2, true);
+          context.fill();
+
+        }
+
+      } // end i loop (particles)
 
       // if (typeof particle.outerColor !== 'undefined') {
       //   context.beginPath();
@@ -357,19 +413,20 @@ function Particle() {
   this.shift = { x: 0, y: 0 };
   this.angle = 0;
   this.speed = 0.02 + 0.02 * Math.random() + this.size * 0.004;
-  this.force = 1.5 + Math.random() * 1.5;
+  this.force = 2.1 + Math.random() * 0.2; // 1.5 + Math.random() * 1.5;
   this.color = '#ddddff';
   this.innerColorStop = 'rgba(256,256,256,1.0)';
   this.outerColor = '#7777ee';
-  this.orbit = 1;
+  this.orbit = 0;
   this.magnet = null;
+  this.betGlowFrames = 0;
+  this.orbitLevel = 2;
 }
 
 function Magnet() {
-  this.orbit = 10;
+  this.orbit = 7;
   this.position = { x: 0, y: 0 };
   this.dragging = false;
-  this.connections = 0;
   this.size = 1;
   this.particles = [];
   this.markedParticles = 0;
