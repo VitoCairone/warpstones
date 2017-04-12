@@ -44,7 +44,7 @@ var Game = new function () {
     rounds: 0,
     captureTo: null,
     warpMotes: [],
-    returnMotes: [],
+    startMotes: 21,
     motesPerRound: 7,
     render: false,
     painter: null,
@@ -94,8 +94,8 @@ var Game = new function () {
         ghost: false,
         motes: []
       }
-      for (var j = 0; j < 28 - 7; j++) {
-        game.players[i].motes.push(10);
+      for (var j = 0; j < (game.startMotes - game.motesPerRound); j++) {
+        game.players[i].motes.push(10); // 10 is just a placeholder value
       }
     }
   }
