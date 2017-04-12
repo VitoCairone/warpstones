@@ -18,11 +18,11 @@ Players begin with 14 mana each and gain 7 mana each at the start of every round
 
 A round has five stages. The first 3 stages are each broken into a bet phase and a match phase.
 
-In the first stage, 2 personal cards and 2 common cards are shown, and everyone is able to wager as much mana as they want for a fixed period of time, about 3.5 seconds. `currently limited to 7 per round, should change.` Then, there can be no more increases, but everyone who is not equal to the highest wager must match the highest (or be all-in) to proceed.
+In the first stage, 2 personal cards and 2 common cards are shown, and everyone is able to wager as much mana as they want for a fixed period of time, about 3.5 seconds. `currently limited to 7 per round, should change.` Then for the next 1.5 seconds, there can be no more increases, but everyone who is not folded or all-in and also not equal to the highest wager must decide to match the highest (or go all-in) to proceed, or else fold. 1.5 seconds are allowed to decide, and at the time limit players who made no input match and proceed default.
 
-In the second stage, 2 more common cards are shown. Wagering proceeds as in the previous stage.
+In the second stage, 2 more common cards are shown. Wagering and matching proceeds as in the previous stage.
 
-In the third stage, 1 more common card is shown. Wagering proceeds as in the previous stage.
+In the third stage, 1 final common card is shown. Wagering and matching proceeds as in the previous stage.
 
 `The current phase logic actually proceeds exactly like Texas Hold'em, 2-3-1-1 and not in the way described here, which is 4-2-1 and is a pending change. The reason for this is that because the deck is simpler and positioning doesn't matter in the same way, there is not enough information in just two cards for an interesting decision`
 
