@@ -1,6 +1,6 @@
 # warpstones
 
-To run the game, just type 'open index.html'.
+To run the game, just type `open index.html` in the terminal.
 
 CSS animations at this time target only recent versions of Chrome and are not yet implemented across browser.
 
