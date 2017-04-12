@@ -2,7 +2,7 @@
 
 To run the game, just type `open index.html` in the terminal.
 
-CSS animations at this time target only recent versions of Chrome and are not yet implemented across browser.
+CSS animations at this time target only recent versions of Chrome and are not yet implemented across browsers.
 
 All animations and graphics are CSS except the mana.
 
@@ -18,7 +18,7 @@ Players begin with 14 mana each and gain 7 mana each at the start of every round
 
 A round has five stages. The first 3 stages are each broken into a bet phase and a match phase.
 
-In the first stage, 2 personal cards and 2 common cards are shown, and everyone is able to wager as much mana as they want for a fixed period of time, about 3.5 seconds. `currently limited to 7 per round, should change.` Then for the next 1.5 seconds, there can be no more increases, but everyone who is not folded or all-in and also not equal to the highest wager must decide to match the highest (or go all-in) to proceed, or else fold. 1.5 seconds are allowed to decide, and at the time limit players who made no input match and proceed default.
+In the first stage, 2 personal cards and 2 common cards are shown, and everyone is able to wager as much mana as they want for a fixed period of time, about 3.5 seconds. `currently limited to 7 per round, should change.` Then for the next 1.5 seconds, there can be no more increases, but everyone who is not folded or all-in and also not equal to the highest wager must decide to match the highest (or go all-in) to proceed, or else fold. 1.5 seconds are allowed to decide, and at the time limit players who made no input match and proceed by default.
 
 In the second stage, 2 more common cards are shown. Wagering and matching proceeds as in the previous stage.
 
