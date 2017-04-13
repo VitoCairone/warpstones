@@ -24,8 +24,6 @@ In the second stage, 2 more common cards are shown. Wagering and matching procee
 
 In the third stage, 1 final common card is shown. Wagering and matching proceeds as in the previous stage.
 
-`The current phase logic actually proceeds exactly like Texas Hold'em, 2-3-1-1 and not in the way described here, which is 4-2-1 and is a pending change. The reason for this is that because the deck is simpler and positioning doesn't matter in the same way, there is not enough information in just two cards for an interesting decision`
-
 The fourth stage is the showdown. Personal cards are revealed for everyone still in the round, and the best hand of 7 cards (called a gestalt) wins. The best gestalt is the one with the largest group of the same kind, and ties are settled by applying the same rule to the remainder of the hand as much as necessary.
 
 The deck is made of 52 cards: 7 each of 7 elements, plus 2 void and 1 gold (change this to spirit). A gestalt of 2 void beats all others.
