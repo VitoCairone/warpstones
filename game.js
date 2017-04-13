@@ -48,7 +48,7 @@ var Game = new function () {
     motesPerRound: 7,
     render: false,
     painter: null,
-    clock: clocks.fast
+    clock: clocks.normal
   };
 
   this.begin = function () {
@@ -102,7 +102,7 @@ var Game = new function () {
 
   function advanceStage() {
     // console.log('started advanceStage');
-    game.stage = (game.stage + 1) % 6
+    game.stage = (game.stage + 1) % 5
     if (game.stage == 0) {
       game.rounds += 1;
     }
@@ -420,33 +420,26 @@ var Game = new function () {
     // console.log("startStage " + game.stage);
     switch (game.stage) {
       case 0:
-        // preflop 
+        // flop
         startRound();
         hideAllCards();
         shuffleCards();
         if (game.render) {
           game.painter.showPersonalCardsFor([1], game.cards);
-        }
-        startBetStage();
-        triggerByClock(endBetStage, game.clock.betStage);
-        break;
-      case 1:
-        // flop
-        if (game.render) {
           game.painter.showFlopCards(game.cards);
         }
         startBetStage();
         triggerByClock(endBetStage, game.clock.betStage);
         break;
-      case 2:
+      case 1:
         // turn
         if (game.render) {
-          game.painter.showTurnCard(game.cards);
+          game.painter.showTurnCards(game.cards);
         }
         startBetStage();
         triggerByClock(endBetStage, game.clock.betStage);
         break;
-      case 3:
+      case 2:
         // river
         if (game.render) {
           game.painter.showRiverCard(game.cards);
@@ -454,7 +447,7 @@ var Game = new function () {
         startBetStage();
         triggerByClock(endBetStage, game.clock.betStage);
         break;
-      case 4:
+      case 3:
         //showdown
         if (game.render) {
           showContestCards();
@@ -462,7 +455,7 @@ var Game = new function () {
         //showWinners();
         showdown();
         break;
-      case 5:
+      case 4:
         //casting
         spellLocking();
       break;

@@ -62,9 +62,9 @@ var Painter = new function () {
     el.classList.add('target' + targNum);
   }
 
-  this.showFlopCards = function (cards) { revealElements([1,2,3], cards); }
+  this.showFlopCards = function (cards) { revealElements([1, 2], cards); }
 
-  this.showTurnCard = function (cards) { revealElements([4], cards); }
+  this.showTurnCards = function (cards) { revealElements([3, 4], cards); }
 
   this.showRiverCard = function (cards) { revealElements([5], cards); }
 
