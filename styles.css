@@ -430,14 +430,20 @@ body {
 }*/
 
 .spellshot {
-  /*display: inline-block;*/
   position: absolute;
   visibility: hidden;
   width: 33px;
   height: 30px;
-  background: url('buster.gif') left center;
-  background-position: -175px -68px;
-  /*border: 1px solid blue;*/
+  background: url('piskel2.gif') left center;
+  background-position: -100px -10px;
+}
+
+/* so this works... but why?? why is the final position
+changed all the way to the RIGHT edge when the initial is defined
+by the left edge? */
+@keyframes playblast {
+  from { background-position-x: -100px; } 
+    to { background-position-x: -206px; }
 }
 
 #spellshot1 {
@@ -524,6 +530,8 @@ body {
 .spellshot.inflight {
   /*border: 2px solid green;*/
   visibility: visible;
+  animation: playblast .35s steps(3) infinite;
+
   transition-property: left, top;
   transition-timing-function: linear, linear, linear;
   transition-duration: 0.7s, 0.7s;
@@ -543,9 +551,9 @@ body {
   -ms-filter: "FlipH";
 }
 
-.spellshot.vanished {
+/*.spellshot.vanished {
   display: none;
-}
+}*/
 
 /*.damage-popup {
   position: absolute;
@@ -670,7 +678,7 @@ body {
        -moz-animation: play .8s steps(3) infinite;
         -ms-animation: play .8s steps(3) infinite;
          -o-animation: play .8s steps(3) infinite;*/
-            animation: play .8s steps(3) infinite;
+            animation: playghost .8s steps(3) infinite;
 }
 
 /*@-webkit-keyframes play {
@@ -689,7 +697,7 @@ body {
    from { background-position-x:    0px; }
      to { background-position-x: -30px; }
 }*/
-@keyframes play {
+@keyframes playghost {
    from { background-position-x:    0px; }
      to { background-position-x: -96px; }
 }
