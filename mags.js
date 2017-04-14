@@ -108,7 +108,7 @@ Magnetic = new function() {
       var particle = magnet.particles.shift();
       magnetTo.particles.unshift(particle);
       particle.magnet = magnetTo;
-      particle.timeToArrival = 40;
+      particle.timeToArrival = Math.round(30 + Math.random() * 30);
     }
     magnet.markedParticles = 0;
   }
@@ -131,6 +131,7 @@ Magnetic = new function() {
       counter = (counter + 1) % toList.length;
       magnetTo.particles.unshift(particle);
       particle.magnet = magnetTo;
+      particle.timeToArrival = Math.round(30 + Math.random() * 30);
     }
 
     // console.log('length is now: ' + magnet.particles.length);
@@ -278,7 +279,7 @@ Magnetic = new function() {
         // Translate towards the magnet position
         // particle.shift.x += (particle.magnet.position.x - particle.shift.x) * particle.speed;
         // particle.shift.y += (particle.magnet.position.y - particle.shift.y) * particle.speed;
-        if (particle.timeToArrival > 0) {
+        if (particle.timeToArrival >= 1) {
           particle.shift.x += (particle.magnet.position.x - particle.shift.x) * 1/particle.timeToArrival;
           particle.shift.y += (particle.magnet.position.y - particle.shift.y) * 1/particle.timeToArrival;
           particle.timeToArrival -= 1;

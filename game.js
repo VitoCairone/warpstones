@@ -691,20 +691,33 @@ var Game = new function () {
       return;
     }
 
-    var counterSync = Math.floor(Math.random() * winners.length);
+    var completeShowdown = function () {
+      var winners = game.winners;
+      var counterSync = Math.floor(Math.random() * winners.length);
+      if (game.render) {
+        Magnetic.distributeParticles(0, winners, counterSync);
+      }
+
+      // distribute motes evenly to winners
+      var count = counterSync;
+      while (game.warpMotes.length > 0) {
+        var mote = game.warpMotes.pop();
+        game.players[winners[count]].motes.push(mote);
+        count = (count + 1) % winners.length;
+      }
+
+      triggerByClock(advanceStage, game.clock.spellLocking);
+    }
+
     if (game.render) {
-      Magnetic.distributeParticles(0, winners, counterSync);
+      // allow time to see the revealed personal cards,
+      // and also for mana from final matches to be collected, 
+      // before distributing to winners
+      console.log("!!!!!!!!")
+      window.setTimeout(completeShowdown, 1000)
+    } else {
+      completeShowdown()
     }
-
-    // distribute motes evenly to winners
-    var count = counterSync;
-    while (game.warpMotes.length > 0) {
-      var mote = game.warpMotes.pop();
-      game.players[winners[count]].motes.push(mote);
-      count = (count + 1) % winners.length;
-    }
-
-    triggerByClock(advanceStage, game.clock.spellLocking);
   }
 
   function spellStrike(pNum, targNum, spellName, moteSpend) {
