@@ -108,6 +108,7 @@ Magnetic = new function() {
       var particle = magnet.particles.shift();
       magnetTo.particles.unshift(particle);
       particle.magnet = magnetTo;
+      particle.timeToArrival = 40;
     }
     magnet.markedParticles = 0;
   }
@@ -273,10 +274,18 @@ Magnetic = new function() {
         
         // Rotation
         particle.angle += particle.speed;
-        
+
         // Translate towards the magnet position
-        particle.shift.x += (particle.magnet.position.x - particle.shift.x) * particle.speed;
-        particle.shift.y += (particle.magnet.position.y - particle.shift.y) * particle.speed;
+        // particle.shift.x += (particle.magnet.position.x - particle.shift.x) * particle.speed;
+        // particle.shift.y += (particle.magnet.position.y - particle.shift.y) * particle.speed;
+        if (particle.timeToArrival > 0) {
+          particle.shift.x += (particle.magnet.position.x - particle.shift.x) * 1/particle.timeToArrival;
+          particle.shift.y += (particle.magnet.position.y - particle.shift.y) * 1/particle.timeToArrival;
+          particle.timeToArrival -= 1;
+        } else {
+          particle.shift.x = particle.magnet.position.x;
+          particle.shift.y = particle.magnet.position.y;
+        }
         
         // Appy the combined position including shift, angle and orbit
         particle.position.x = particle.shift.x + Math.cos(i+particle.angle) * (particle.orbit*particle.force*orbitPush);
@@ -420,7 +429,7 @@ function Particle() {
   this.orbit = 0;
   this.magnet = null;
   this.betGlowFrames = 0;
-  this.orbitLevel = 2;
+  this.timeToArrival = 0;
 }
 
 function Magnet() {
