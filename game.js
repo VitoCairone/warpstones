@@ -48,7 +48,7 @@ var Game = new function () {
     motesPerRound: 7,
     render: false,
     painter: null,
-    clock: clocks.normal
+    clock: clocks.fast
   };
 
   this.begin = function () {
@@ -159,13 +159,19 @@ var Game = new function () {
   }
 
   function endSpellCastingStage() {
-    if (!detectWinCondition()) {
+    if (detectWinCondition()) {
+      endGame();
+    } else {
       advanceStage();
     }
   }
 
   function endBetStage() { 
     startMatchStage();
+  }
+
+  function endGame() {
+    ;
   }
 
   function endMatchStage() {
@@ -501,28 +507,30 @@ var Game = new function () {
   }
 
   function detectWinCondition() {
-    var teamAlive = false;
-    for (var i = 1; i <= 4 && teamAlive == false; i++) {
+    var teamOneAlive = false;
+    var teamTwoAlive = false;
+
+    for (var i = 1; i <= 4 && teamOneAlive == false; i++) {
       if (!game.players[i].ghost) {
-        teamAlive = true;
+        teamOneAlive = true;
       }
     }
 
-    if (teamAlive) {
-      teamAlive = false;
-      for (var i = 5; i <= 8 && teamAlive == false; i++) {
-        if (!game.players[i].ghost) {
-          teamAlive = true;
-        }
+    for (var i = 5; i <= 8 && teamTwoAlive == false; i++) {
+      if (!game.players[i].ghost) {
+        teamTwoAlive = true;
       }
     }
 
-    if (!teamAlive) {
+    if ( (!teamOneAlive) || (!teamTwoAlive) ) {
       var elapsed = new Date().getTime() - game.startTime;
       // var message = 'game ended in ' + (elapsed / (60 * 1000)) + ' min';
       var message = 'game ended in ' + game.rounds + ' rounds';
       console.log(message);
-      alert(message);
+      if (game.render) {
+        game.painter.animateEnd(teamOneAlive, teamTwoAlive);
+      }
+      // alert(message);
       return true;
     }
 

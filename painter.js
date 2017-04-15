@@ -46,6 +46,18 @@ var Painter = new function () {
     Magnetic.hiliteMagnetParticle(pNum);
   }
 
+  this.animateEnd = function (teamOneWins, teamTwoWins) {
+    var message = 'VICTORY!'
+    if (teamOneWins && teamTwoWins) {
+      message = 'TIED'
+    } else if (teamTwoWins) {
+      message = 'DEAFEAT'
+    }
+    var el = document.getElementById('end-game-report');
+    el.innerHTML = message;
+    el.classList.add('show');
+  }
+
   this.animateEndMatchStage = function () {
     for (var i = 1; i <= 8; i++) {
       Magnetic.transferMarkedParticles(i, 0);
