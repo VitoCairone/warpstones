@@ -657,6 +657,11 @@ by the left edge? */
   -webkit-transition-timing-function: linear;*/
 }
 
+#end-game-report {
+  background-color: orange;
+  border: 4px solid red;
+}
+
 .spin-1s {
     /* spin */
   -webkit-animation-name: spin;
