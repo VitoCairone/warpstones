@@ -9,16 +9,16 @@ var Painter = new function () {
     }, 500)
   }
 
-  this.animateSprites = function () {
-    var sprites = document.getElementsByClassName("sprite");
-    for (var i = 0; i < sprites.length; i++) {
-      sprites[i].classList.remove('frame-1', 'frame-2', 'frame-3', 'frame-4');
-      var frame = parseInt(sprites[i].getAttribute('frame'));
-      frame = (frame + 1) % 5 || 1;
-      sprites[i].classList.add('frame-' + frame);
-      sprites[i].setAttribute('frame', frame);
-    };
-  }
+  // this.animateSprites = function () {
+  //   var sprites = document.getElementsByClassName("sprite");
+  //   for (var i = 0; i < sprites.length; i++) {
+  //     sprites[i].classList.remove('frame-1', 'frame-2', 'frame-3', 'frame-4');
+  //     var frame = parseInt(sprites[i].getAttribute('frame'));
+  //     frame = (frame + 1) % 5 || 1;
+  //     sprites[i].classList.add('frame-' + frame);
+  //     sprites[i].setAttribute('frame', frame);
+  //   };
+  // }
 
   this.animateResetTimerBar = function () {
     console.log('resetting');

@@ -48,7 +48,7 @@ var Game = new function () {
     motesPerRound: 7,
     render: false,
     painter: null,
-    clock: clocks.fast
+    clock: clocks.normal
   };
 
   this.begin = function () {
@@ -238,9 +238,9 @@ var Game = new function () {
     console.log ('started gameLoop')
     advanceStage();
 
-    if (game.render) {
-      window.setInterval(game.painter.animateSprites, 1000 / 3);
-    }
+    // if (game.render) {
+    //   window.setInterval(game.painter.animateSprites, 1000 / 3);
+    // }
   }
 
   function getPlayerCards(pNum) {

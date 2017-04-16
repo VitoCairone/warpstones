@@ -324,14 +324,21 @@ body {
 
 .sprite {
   position: absolute;
-  height: 40px;
+  height: 31px;
   width: 30px;
-  background-image: url('idle_1.png');
-  background-size: 30px 40px;
+  background: url('piskel3.png') left center;
+  /*background-size: 30px 40px;*/
+  background-position: 0px, 0px;
   /*background-color: blue;*/
   /*border-radius: 10%;*/
   /*border: 1px solid orange;*/
   margin: 0px;
+  animation: playsprite 0.4s steps(4) infinite;
+}
+
+@keyframes playsprite {
+   from { background-position-x:   0px; }
+     to { background-position-x: -120px; }
 }
 
 .sprite.top-row {
@@ -380,18 +387,6 @@ body {
 
 #foeTeamBox .sprite.bot-row {
   right: 28px;
-}
-
-.sprite.frame-2 {
-  background-image: url('idle_2.png');
-}
-
-.sprite.frame-3 {
-  background-image: url('idle_3.png');
-}
-
-.sprite.frame-4 {
-  background-image: url('idle_4.png');
 }
 
 .sprite.right-sprite {
