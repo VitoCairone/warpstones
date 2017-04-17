@@ -17,6 +17,7 @@
     pressFold = new function () {};
     pressBet = new function () {};
     pressSpellLock = new function () {};
+    pressContinue = new function () {};
 
     // modern phones will intentionally ignore user-scalable=no,
     // because they meaning that tapping on the screen,
@@ -126,7 +127,10 @@
 
       </div> <!-- /combat-area -->
 
-      <div id="end-game-report">!!!</div>
+      <div id="end-game-report-box">
+        <div id="end-game-report"></div>
+        <div id="continue-button" onclick="pressContinue()">CONTINUE</div>
+      </div>
 
     </div> <!-- /scene-box -->
 
@@ -220,6 +224,8 @@
     pressFold = Game.pressFold;
     pressBet = Game.pressBet;
     pressSpellLock = Game.pressSpellLock;
+    pressContinue = Game.pressContinue;
+
     Game.begin();
 
   </SCRIPT>

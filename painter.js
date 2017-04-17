@@ -53,9 +53,18 @@ var Painter = new function () {
     } else if (teamTwoWins) {
       message = 'DEAFEAT'
     }
-    var el = document.getElementById('end-game-report');
-    el.innerHTML = message;
-    el.classList.add('show');
+    document.getElementById('end-game-report').innerHTML = message;
+    document.getElementById('end-game-report-box').classList.add('show');
+  }
+
+  this.animateContinue = function () {
+    document.getElementById('end-game-report-box').classList.remove('show'); 
+
+    for (var i = 1; i <= 8; i++) {
+      this.reviveSprite(i);
+    }
+    
+    Magnetic.reset();
   }
 
   this.animateEndMatchStage = function () {

@@ -48,7 +48,7 @@ var Game = new function () {
     motesPerRound: 7,
     render: false,
     painter: null,
-    clock: clocks.normal
+    clock: clocks.fast
   };
 
   this.begin = function () {
@@ -70,6 +70,14 @@ var Game = new function () {
     // spellLock(1);
   }
 
+  this.pressContinue = function () {
+    if (game.render) {
+      game.painter.animateContinue();
+    }
+    reset();
+    advanceStage();
+  }
+
   this.setPainter = function (painter) {
     game.render = true;
     game.painter = painter;
@@ -81,13 +89,22 @@ var Game = new function () {
     }
     game.cards = game.cards.concat(['void', 'void', 'gold']);
 
+    reset();
+  }
+
+  function reset() {
+
+    game.stage = -1;
+    game.rounds = 0;
+    game.captureTo = null;
+    game.warpMotes = [];
+
     var names = [null, 'Alan', 'Betty', 'Carl', 'Diane', 'Ed', 'Felicia', 'Gary', 'Helen']
 
     for (var i = 1; i <= 8; i++) {
       game.players[i] = {
         name: names[i],
         hp: 700,
-        // mana: 1000,
         thisStageBet: 0,
         folded: false,
         allIn: false,
@@ -98,6 +115,7 @@ var Game = new function () {
         game.players[i].motes.push(10); // 10 is just a placeholder value
       }
     }
+
   }
 
   function advanceStage() {

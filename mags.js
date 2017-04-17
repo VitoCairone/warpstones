@@ -166,6 +166,14 @@ Magnetic = new function() {
     }
   }
 
+  this.reset = function () {
+    particles.length = 0;
+    magnets.length = 0;
+    nextParticleId = 0;
+    maxMarkedParticles = 0;
+    createMagnets();
+  }
+
   function createMagnets() {
     var w = 393;
     var h = 262;
