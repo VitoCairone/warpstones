@@ -1,74 +1,90 @@
 var SpellBook = {
-
-  // Signatures, cost 7 - 21
-
-  // 'Focus': {
-  //   dtype: 'spell',
-  //   requires: 'any',
-  //   cost: 21,
-  //   target: 'self',
-  //   bonusX: { power: 2 },
-  //   until: 'spellcast'
-  // }
+  'Pew': {
+    dtype: 'spell',
+    requires: 'any',
+    costFraction: 1 / 7,
+    damageX: 1.0
+  },
   'Force Blast': {
     dtype: 'spell',
     requires: 'any',
-    cost: 21,
-    damageX: 5,
+    costFraction: 1 / 3,
+    damageX: 1.0,
   },
+  'Power Blast': {
+    dtype: 'spell',
+    requires: 'any',
+    costFraction: 2 / 3,
+    damageX: 1.0
+  },
+  'Ultra Blast' {
+    dtype: 'spell',
+    requires: 'any',
+    costFraction: 1,
+    damageX: 1.0
+  }
+}
 
-  // Specials, cost around 49
+var SpellList = Object.keys(SpellBook);
 
-  'Wind': {
-    dtype: 'spell',
-    requires: 'air',
-    requireCount: 2,
-    cost: 49,
-    damageX: 7
-  },
-  'Water': {
-    dtype: 'spell',
-    requires: 'water',
-    requireCount: 2,
-    cost: 49,
-    damageX: 7
-  },
-  'Ice': {
-    dtype: 'spell',
-    requires: 'ice',
-    requireCount: 2,
-    cost: 49,
-    damageX: 7
-  },
-  'Earth': {
-    dtype: 'spell',
-    requires: 'earth',
-    requireCount: 2,
-    cost: 49,
-    damageX: 7,
-  },
-  'Light': {
-    dtype: 'spell',
-    target: 'self',
-    requires: 'light',
-    requireCount: 2,
-    cost: 49,
-    healX: 7
-  },
-  'Fire': {
-    dtype: 'spell',
-    requires: 'fire',
-    requreCount: 2,
-    cost: 49,
-    damageX: 7
-  },
-  'Dark': {
-    dtype: 'spell',
-    requires: 'dark',
-    requireCount: 2,
-    cost: 49,
-    damageX: 7
-  },
+// set keys as .name on each objects as well
+for (var i = 0; i < SpellList.length; i++) {
+  var spellName = SpellList[i];
+  SpellBook[spellName].name = spellName;
+}
+
+  // // Specials, cost around 49
+
+  // 'Wind': {
+  //   dtype: 'spell',
+  //   requires: 'air',
+  //   requireCount: 2,
+  //   cost: 49,
+  //   damageX: 7
+  // },
+  // 'Water': {
+  //   dtype: 'spell',
+  //   requires: 'water',
+  //   requireCount: 2,
+  //   cost: 49,
+  //   damageX: 7
+  // },
+  // 'Ice': {
+  //   dtype: 'spell',
+  //   requires: 'ice',
+  //   requireCount: 2,
+  //   cost: 49,
+  //   damageX: 7
+  // },
+  // 'Earth': {
+  //   dtype: 'spell',
+  //   requires: 'earth',
+  //   requireCount: 2,
+  //   cost: 49,
+  //   damageX: 7,
+  // },
+  // 'Light': {
+  //   dtype: 'spell',
+  //   target: 'self',
+  //   requires: 'light',
+  //   requireCount: 2,
+  //   cost: 49,
+  //   healX: 7
+  // },
+  // 'Fire': {
+  //   dtype: 'spell',
+  //   requires: 'fire',
+  //   requreCount: 2,
+  //   cost: 49,
+  //   damageX: 7
+  // },
+  // 'Dark': {
+  //   dtype: 'spell',
+  //   requires: 'dark',
+  //   requireCount: 2,
+  //   cost: 49,
+  //   damageX: 7
+  // },
 
   // Ultimates, cost around 98 or 147
 
@@ -109,14 +125,7 @@ var SpellBook = {
   //   damageX: 7
   // }
 
-};
-
-var SpellList = Object.keys(SpellBook);
-
-for (var i = 0; i < SpellList.length; i++) {
-  var spellName = SpellList[i];
-  SpellBook[spellName].name = spellName;
-}
+// };
 
 /* Extended Nonsense
 

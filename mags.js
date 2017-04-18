@@ -87,6 +87,13 @@ Magnetic = new function() {
     }
   }
 
+  this.hiliteMagnetParticles = function (magnetIdx, count) {
+    // the laziest of hacks, git-r-done
+    for (var i = 0; i < count; i++) {
+      this.hiliteMagnetParticle(magnetIdx);
+    }
+  }
+
   this.unhiliteAllParticles = function () {
     for (var i = 0; i < magnets.length; i++) {
       magnets[i].markedParticles = 0;

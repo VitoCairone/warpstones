@@ -87,3 +87,7 @@ function printOutOdds() {
     console.log(score + ': 1 in ' + odds);
   }
 }
+
+function main() {
+  console.log('hello!');
+}

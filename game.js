@@ -54,7 +54,7 @@ var Game = new function () {
     clock: clocks.fast,
     newAllIns: [],
     sidePots: [],
-    baseDamageMod: 7
+    baseDamageMod: 100
   }
 
   this.begin = function () {
@@ -159,14 +159,23 @@ var Game = new function () {
       return 0;
     }
 
+    var betSize = Math.floor(game.roundStartMana[pNum] * (player.betCount + 1) / 7);
+    if (betSize == 0 && player.motes.length > 0) {
+      betSize = 1;
+    } else if (betSize > game.forceEndBetSize) {
+      betSize = game.forceEndBetSize;
+    }
+
     player.betCount += 1;
-    var mote = player.motes.pop();
-    game.warpMotes.push(mote);
+    sendMotesToWarp(pNum, betSize);
+    // var mote = player.motes.pop();
+    // game.warpMotes.push(mote);
 
     if (game.render) {
-      game.painter.animateBet(pNum);
+      game.painter.animateBet(pNum, betSize);
     }
-    console.log(player.name + " bets with " +  player.motes.length + " remaining.")
+
+    console.log(player.name + " bets " + betSize + " with " +  player.motes.length + " remaining.")
 
     if (player.motes.length == 0) {
       console.log("set " + pNum + " " + player.name + " all-in @bet.");
@@ -432,7 +441,9 @@ var Game = new function () {
     if (amount == 0) {
       return;
     }
+
     var player = game.players[pNum];
+
     if (amount == 1) {
       // note that this is from the opposide side as a multiple move
       game.warpMotes.push(player.motes.pop());
@@ -546,6 +557,9 @@ var Game = new function () {
       Magnetic.unhiliteAllParticles();
     }
 
+    var topStack = 0;
+    var secondStack = 0;
+
     for (var i = 1; i <= 8; i++) {
       var player = game.players[i];
       player.allIn = false;
@@ -562,6 +576,11 @@ var Game = new function () {
         player.motes.push(10);
       }
 
+      if (player.motes.length >= topStack) {
+        secondStack = topStack;
+        topStack = player.motes.length;
+      }
+
       game.roundStartMana[i] = player.motes.length;
 
       if (game.render) {
@@ -569,6 +588,9 @@ var Game = new function () {
         Magnetic.expandParticles(i);
       }
     }
+
+    game.forceEndWager = secondStack;
+    game.forceEndBetSize = Math.ceil(game.forceEndWager / 7);
 
     console.log("roundStartMana: " + game.roundStartMana);
   }
@@ -675,10 +697,10 @@ var Game = new function () {
       var elapsed = new Date().getTime() - game.startTime;
       // var message = 'game ended in ' + (elapsed / (60 * 1000)) + ' min';
       var message = 'game ended in ' + game.rounds + ' rounds';
+      console.log(message);
 
       autoAdjustDamageMod();
 
-      console.log(message);
       if (game.render) {
         game.painter.animateEnd(teamOneAlive, teamTwoAlive);
       }

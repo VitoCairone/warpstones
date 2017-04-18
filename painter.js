@@ -47,8 +47,8 @@ var Painter = new function () {
     document.getElementById('progress-bar-fill').classList.add('match-stage');
   }
 
-  this.animateBet = function (pNum) {
-    Magnetic.hiliteMagnetParticle(pNum);
+  this.animateBet = function (pNum, betSize) {
+    Magnetic.hiliteMagnetParticles(pNum, betSize);
   }
 
   this.animateEnd = function (teamOneWins, teamTwoWins) {
