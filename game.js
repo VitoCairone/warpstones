@@ -48,8 +48,11 @@ var Game = new function () {
     motesPerRound: 7,
     render: false,
     painter: null,
-    clock: clocks.fast
+    clock: clocks.fast,
+    newAllIns: []
   };
+
+  logging = function ()
 
   this.begin = function () {
     game.startTime = new Date().getTime();
@@ -149,7 +152,7 @@ var Game = new function () {
     console.log(player.name + " bets")
 
     if (player.motes.length == 0) {
-      player.allIn = true;
+      setAllIn(pNum);
       checkForCapture();
     }
 
@@ -315,11 +318,16 @@ var Game = new function () {
     console.log(player.name + " calls");
 
     if (player.motes.length == 0) {
-      player.allIn = true;
+      setAllIn(pNum);
       checkForCapture();
     }
 
     return 1;
+  }
+
+  function setAllIn(pNum) {
+    game.players[pNum].allIn = true;
+    game.newAllIns.push(pNum);
   }
 
   function setMessage(msg) {
