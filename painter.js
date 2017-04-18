@@ -1,4 +1,9 @@
 var Painter = new function () {
+
+  this.animateAllIn = function (pNum) {
+    return;
+  }
+
   this.animateDamage = function (pNum, amount) {
     var el = document.getElementById('damage-popup-' + pNum);
     el.innerHTML = amount;
@@ -21,7 +26,7 @@ var Painter = new function () {
   // }
 
   this.animateResetTimerBar = function () {
-    console.log('resetting');
+    // console.log('resetting timer bar');
     // document.getElementById('progress-bar-fill').style.width = "0%";
     document.getElementById('progress-bar-fill').classList.remove('bet-stage', 'match-stage');
     // document.getElementById('progress-bar-fill').classList.add('reset');

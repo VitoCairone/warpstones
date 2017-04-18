@@ -14,6 +14,9 @@ console.log('start game.js read');
 
 var Game = new function () {
 
+  var gameCounter = 0;
+  var autoAdjustSize = 0.1;
+
   var clocks = {
     normal: {
       betStage: 3500,
@@ -49,10 +52,10 @@ var Game = new function () {
     render: false,
     painter: null,
     clock: clocks.fast,
-    newAllIns: []
-  };
-
-  logging = function ()
+    newAllIns: [],
+    sidePots: [],
+    baseDamageMod: 7
+  }
 
   this.begin = function () {
     game.startTime = new Date().getTime();
@@ -74,11 +77,7 @@ var Game = new function () {
   }
 
   this.pressContinue = function () {
-    if (game.render) {
-      game.painter.animateContinue();
-    }
-    reset();
-    advanceStage();
+    startNewGame();
   }
 
   this.setPainter = function (painter) {
@@ -95,12 +94,30 @@ var Game = new function () {
     reset();
   }
 
+  function autoAdjustDamageMod() {
+    var ROUNDS_TARGET = 22;
+    gameCounter++;
+    if (game.rounds > ROUNDS_TARGET) {
+      game.baseDamageMod = Math.round(game.baseDamageMod * 100 * (1 + autoAdjustSize)) / 100;
+    } else if (game.rounds < ROUNDS_TARGET) {
+      game.baseDamageMod = Math.round(game.baseDamageMod * 100 * (1 - autoAdjustSize)) / 100;
+    }
+    autoAdjustSize *= 0.999;
+    console.log("######################################");
+    console.log("######################################");
+    console.log("######################################");
+    console.log("######################################");
+    console.log("###### baseDamageMod set to " + game.baseDamageMod);
+  }
+
   function reset() {
 
     game.stage = -1;
     game.rounds = 0;
     game.captureTo = null;
     game.warpMotes = [];
+    game.newAllIns = [];
+    game.sidePots = [];
 
     var names = [null, 'Alan', 'Betty', 'Carl', 'Diane', 'Ed', 'Felicia', 'Gary', 'Helen']
 
@@ -149,9 +166,10 @@ var Game = new function () {
     if (game.render) {
       game.painter.animateBet(pNum);
     }
-    console.log(player.name + " bets")
+    console.log(player.name + " bets with " +  player.motes.length + " remaining.")
 
     if (player.motes.length == 0) {
+      console.log("set " + pNum + " " + player.name + " all-in @bet.");
       setAllIn(pNum);
       checkForCapture();
     }
@@ -172,6 +190,49 @@ var Game = new function () {
     if (canAct == 1) {
       game.captureTo = leaderIdx;
     }
+  }
+
+  function createSidePot(requirement, outstanding) {
+    if (requirement == 0) {
+      alert("Error: requirement 0 in createSidePot");
+      return;
+    }
+    if (outstanding == 0) {
+      // a pot with outstanding 0 means two players
+      // went all-in with exactly the same amount of mana.
+      // The first side-pot handles their wager completely,
+      // so don't create another
+      return;
+    }
+    var eligible = [];
+
+    for (var i = 1; i <= 8; i++) {
+      if (!game.players[i].folded && game.roundStartMana[i] >= requirement) {
+        eligible.push(i);
+      }
+    }
+
+    // at this point, all this bet mana has actually already been
+    // pushed into the warp. So, we need to extract the motes which are
+    // specific to this side pot from there.
+
+    var amount = null;
+    if (requirement == outstanding) {
+      // this is the first sidePot being created within this stage
+      amount = game.roundStartMana[0];
+      amount += eligible.length * requirement;
+    } else {
+      amount = 0;
+      amount += eligible.length * outstanding;
+    }
+
+    var transfer = game.warpMotes.slice(0, amount);
+    game.warpMotes = game.warpMotes.slice(amount, Infinity);
+
+    game.sidePots.push({
+      eligible: eligible,
+      motes: transfer
+    });
   }
 
   function decideBets(pNum) {
@@ -219,6 +280,38 @@ var Game = new function () {
       }
     }
 
+    if (game.newAllIns.length > 0) {
+      console.log("newAllIns: " + game.newAllIns);
+
+      console.log("PRESORT");
+      for (var i = 0; i < game.newAllIns.length; i++) {
+        console.log(game.newAllIns[i] + " round start mana " + game.roundStartMana[game.newAllIns[i]]); 
+      }
+
+      // turn newAllIns from this stage into sidePots
+      // first, sort newAllIns by roundStartMana, DESCENDING
+      game.newAllIns.sort(function (a, b) {
+        return game.roundStartMana[b] - game.roundStartMana[a];
+      });
+      var previous = 0;
+      var outstanding = null;
+      var pNum = null;
+      var amount = null;
+
+      console.log("POSTSORT");
+      for (var i = 0; i < game.newAllIns.length; i++) {
+        console.log(game.newAllIns[i] + " round start mana " + game.roundStartMana[game.newAllIns[i]]); 
+      }
+
+      while (game.newAllIns.length > 0) {
+        pNum = game.newAllIns.pop();
+        amount = game.roundStartMana[pNum];
+        outstanding = amount - previous;
+        createSidePot(amount, outstanding);
+        previous = amount;
+      }
+    }
+
     console.log("Warp now has " + game.warpMotes.length);
 
     if (game.render) {
@@ -229,7 +322,7 @@ var Game = new function () {
 
     if (game.captureTo != null) {
       console.log("Captured by " + game.players[game.captureTo].name);
-      game.stage = 3;
+      game.stage = 2; // cause advanceStage to go right to showdown
     }
 
     advanceStage();
@@ -315,9 +408,10 @@ var Game = new function () {
       }
     }
 
-    console.log(player.name + " calls");
+    console.log(player.name + " calls@meet with " + player.motes.length + " remaining.");
 
     if (player.motes.length == 0) {
+      console.log("set " + pNum + " " + game.players[pNum].name  + " all-in @meet.")
       setAllIn(pNum);
       checkForCapture();
     }
@@ -328,6 +422,26 @@ var Game = new function () {
   function setAllIn(pNum) {
     game.players[pNum].allIn = true;
     game.newAllIns.push(pNum);
+
+    if (game.render) {
+      game.painter.animateAllIn(pNum);
+    }
+  }
+
+  function sendMotesToWarp(pNum, amount) {
+    if (amount == 0) {
+      return;
+    }
+    var player = game.players[pNum];
+    if (amount == 1) {
+      // note that this is from the opposide side as a multiple move
+      game.warpMotes.push(player.motes.pop());
+      return;
+    }
+
+    var transfer = player.motes.slice(0, amount);
+    player.motes = player.motes.slice(amount, Infinity)
+    game.warpMotes = game.warpMotes.concat(transfer);
   }
 
   function setMessage(msg) {
@@ -349,10 +463,12 @@ var Game = new function () {
   }
 
   function shuffleCards() {
-    shuffle(game.cards)
+    shuffle(game.cards);
   }
 
   function startBetStage() { 
+
+    console.log("~ BET STAGE " + game.stage + " START ~");
 
     if (game.render) {
       game.painter.animateBetTimerBar();
@@ -411,26 +527,29 @@ var Game = new function () {
     triggerByClock(endMatchStage, game.clock.matchStage);
   }
 
+  function startNewGame() {
+    if (game.render) {
+      game.painter.animateContinue();
+    }
+    reset();
+    advanceStage();
+  }
+
   function startRound() {
     updateHealthReadout();
+    console.log('~~~ ROUND ' + game.rounds + ' START! ~~~');
     game.captureTo = null;
+    game.sidePots = [];
+    game.roundStartMana = [game.warpMotes.length, 0, 0, 0, 0, 0, 0, 0, 0];
 
     if (game.render) {
       Magnetic.unhiliteAllParticles();
     }
 
-    console.log('Round start!');
-
     for (var i = 1; i <= 8; i++) {
       var player = game.players[i];
-      // player.startMana = player.mana;
       player.allIn = false;
       player.folded = false;
-      // if (player.motes.length == 0) {
-      //   console.log(player.name + " is OUT!")
-      //   fold(i);
-      // }
-
       var gain = game.motesPerRound;
       if (player.ghost) {
         gain = Math.ceil(gain * 4 / 7);
@@ -443,15 +562,19 @@ var Game = new function () {
         player.motes.push(10);
       }
 
+      game.roundStartMana[i] = player.motes.length;
+
       if (game.render) {
         Magnetic.conjureParticles(i, gain);
         Magnetic.expandParticles(i);
       }
     }
+
+    console.log("roundStartMana: " + game.roundStartMana);
   }
 
   function startStage() {
-    // console.log("startStage " + game.stage);
+    game.newAllIns.length = 0;
     switch (game.stage) {
       case 0:
         // flop
@@ -552,11 +675,18 @@ var Game = new function () {
       var elapsed = new Date().getTime() - game.startTime;
       // var message = 'game ended in ' + (elapsed / (60 * 1000)) + ' min';
       var message = 'game ended in ' + game.rounds + ' rounds';
+
+      autoAdjustDamageMod();
+
       console.log(message);
       if (game.render) {
         game.painter.animateEnd(teamOneAlive, teamTwoAlive);
       }
-      // alert(message);
+
+      window.setTimeout(function () {
+        startNewGame();
+      }, 5000);
+
       return true;
     }
 
@@ -602,19 +732,19 @@ var Game = new function () {
     return;
   }
 
-  function findWinners() {
-    var gestalt = [];
-    var score = 0;
-    var topScore = 0;
-    var topScoreNums = [];
+  function setGestaltRanks() {
     for (var i = 1; i <= 8; i++) {
+      // skip folded players because they are never eligible,
+      // even for side pots
       if (game.players[i].folded) {
         continue;
       }
       var player = game.players[i];
       var gestalt = getCommonCards().concat(getPlayerCards(i));
+      var score = gestaltRank(gestalt);
+
       player.gestalt = gestalt;
-      score = gestaltRank(gestalt);
+      player.gestaltRank = score;
 
       var shortHand = [];
       for (var j = 0; j < gestalt.length; j++) {
@@ -622,12 +752,28 @@ var Game = new function () {
       }
       console.log(player.name + ' has ' + shortHand.join('') + ' worth ' + score);
       // game.players[i].score = score;
+    }
+  }
 
+  function findWinners(pot) {
+    if (pot.eligible.length == 0) {
+      alert("ERROR: no eligible players in findWinners");
+      return;
+    }
+
+    var pNum = null;
+    var score = 0;
+    var topScore = 0;
+    var topScoreNums = [];
+    
+    for (var i = 0; i < pot.eligible.length; i++) {
+      pNum = pot.eligible[i];
+      score = game.players[pNum].gestaltRank;
       if (score > topScore) {
         topScore = score;
-        topScoreNums = [i];
+        topScoreNums = [pNum];
       } else if (score == topScore) {
-        topScoreNums.push(i);
+        topScoreNums.push(pNum);
       }
     }
 
@@ -703,44 +849,115 @@ var Game = new function () {
     ];
 
     var targets = targetPriorities[pNum];
+
     for (var i = 0; i < 4; i++) {
       if (!game.players[targets[i]].ghost) {
         return targets[i];
       }
     }
-
     // guess the game is over! just return normal target
     return targets[0];
   }
 
+  function reporting(str) {
+    switch (str) {
+      case 'stages': return true;
+      default: return true;
+    }
+  }
 
+  function sendManaToWinners() {
+    game.counterSync = Math.round(Math.random() * 1000000);
 
-  function showdown() {
+    var winnings = [null, 0, 0, 0, 0, 0, 0, 0, 0];
+    var pNum = null;
+    var amount = 0;
 
-    console.log('showdown');
+    setGestaltRanks();
 
-    var winners = findWinners();
-    game.winners = winners;
-
-    if (winners.length < 1) {
-      console.log("ERROR: no winners");
-      return;
+    // presuming it exists, push the final pot as another sidePot
+    // so we don't need any special logic for it
+    if (game.warpMotes.length > 0) {
+      var eligible = [];
+      for (var i = 1; i <= 8; i++) {
+        if ((!game.players[i].folded) && (!game.players[i].allIn)) {
+          eligible.push(i);
+        }
+      }
+      game.sidePots.push({
+        eligible: eligible,
+        motes: game.warpMotes
+      });
+      game.warpMotes = [];
     }
 
-    var completeShowdown = function () {
-      var winners = game.winners;
-      var counterSync = Math.floor(Math.random() * winners.length);
-      if (game.render) {
-        Magnetic.distributeParticles(0, winners, counterSync);
+    // this routine goes through every side pot, from newest first
+    // -- not because it's important but just because push/pop alone is
+    // simpler than adding shift/unshift --
+    // and distributes motes to every winner of each side pot.
+    // In the simplest case, when there is one pot and one winner, that
+    // one pot was just added as the final (and only) side pot. All motes
+    // are sent to the one winner, and there is no remainder. However,
+    // if there are side pots and/or multiple winners, motes must be
+    // distributed whole and undivided, in an unbiased way.
+
+    console.log("sidePotLens = " + game.sidePots.length);
+
+    while (game.sidePots.length > 0) {
+
+      var sidePot = game.sidePots.pop();
+
+      var winners = findWinners(sidePot);
+
+      amount = Math.floor(sidePot.motes.length / winners.length);
+
+      for (var i = 0; i < winners.length; i++) {
+        pNum = winners[i];
+        winnings[pNum] += amount;
+        game.players[pNum].motes = game.players[pNum].motes.concat(sidePot.motes.slice(0, amount));
+        sidePot.motes = sidePot.motes.slice(amount, Infinity);
       }
 
-      // distribute motes evenly to winners
-      var count = counterSync;
-      while (game.warpMotes.length > 0) {
-        var mote = game.warpMotes.pop();
-        game.players[winners[count]].motes.push(mote);
-        count = (count + 1) % winners.length;
+      while (sidePot.motes.length >  0) {
+        var pNum = winners[(++game.counterSync) % winners.length];
+        var mote = sidePot.motes.pop();
+        game.players[pNum].motes.push(mote);
+        winnings[pNum]++;
       }
+
+    }
+
+    return winnings;
+  }
+
+  function showdown() {
+    if (reporting('stages')) console.log('showdown');
+    var completeShowdown = function () {
+      var winnings = sendManaToWinners();
+      if (game.render) {
+        // MUST CHANGE IN MAGNETIC !!
+        Magnetic.distributeParticles(winnings);
+      }
+
+      game.winners = [];
+      for (var i = 1; i <= 8; i++) {
+        if (winnings[i] > 0) {
+          game.winners.push(i);
+        }
+      }
+
+      // var winners = game.winners;
+      // var winnings = game.winnings;
+
+      // var counterSync = Math.floor(Math.random() * winners.length);
+
+      // distribute motes evenly to winners
+      // var count = counterSync;
+      // while (game.warpMotes.length > 0) {
+      //   var mote = game.warpMotes.pop();
+      //   game.players[winners[count]].motes.push(mote);
+      //   count = (count + 1) % winners.length;
+      // }
 
       triggerByClock(advanceStage, game.clock.spellLocking);
     }
@@ -749,8 +966,7 @@ var Game = new function () {
       // allow time to see the revealed personal cards,
       // and also for mana from final matches to be collected, 
       // before distributing to winners
-      console.log("!!!!!!!!")
-      window.setTimeout(completeShowdown, 1000)
+      window.setTimeout(completeShowdown, 1000);
     } else {
       completeShowdown()
     }
@@ -758,12 +974,10 @@ var Game = new function () {
 
   function spellStrike(pNum, targNum, spellName, moteSpend) {
 
-    var baseDamageMod = 7;
-
     var player = game.players[pNum];
     var target = game.players[targNum];
 
-    var dam = baseDamageMod * moteSpend;
+    var dam = game.baseDamageMod * moteSpend;
 
     if (target.ghost) {
       dam = 0;

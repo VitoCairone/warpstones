@@ -113,25 +113,36 @@ Magnetic = new function() {
     magnet.markedParticles = 0;
   }
 
-  this.distributeParticles = function (from, toList, counterSync) {
-    if (toList.length < 1) {
-      return;
-    }
-
-    // console.log('in distribPart');
-    // console.log('toList: ' + JSON.stringify(toList));
+  this.distributeParticles = function (winnings) {
+    // amounts is going to be destructed in this function
+    var amounts = winnings.concat([]);
+    var from = 0;
     var magnet = magnets[from];
-    var counter = counterSync;
 
-    // console.log('length is now: ' + magnet.particles.length);
+    console.log("amounts = " + amounts);
+    console.log("potParticles = " + magnet.particles.length);
+    // alert('paused');
+
+    winner = 1;
     while (magnet.particles.length > 0) {
-      // console.log('running ' + i);
+      while (amounts[winner] == 0) {
+        winner++;
+        if (winner > 8) {
+          alert('error: winner exceeded range in distributeParticles');
+          return;
+        }
+      }
+      amounts[winner]--;
       var particle = magnet.particles.shift();
-      var magnetTo = magnets[toList[counter]];
-      counter = (counter + 1) % toList.length;
+      var magnetTo = magnets[winner];
       magnetTo.particles.unshift(particle);
       particle.magnet = magnetTo;
       particle.timeToArrival = Math.round(30 + Math.random() * 30);
+    }
+
+    if (amounts[winner] != 0) {
+      alert('error: did not meet send amount in distributeParticles');
+      return;
     }
 
     // console.log('length is now: ' + magnet.particles.length);
