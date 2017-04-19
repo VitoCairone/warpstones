@@ -129,7 +129,8 @@ var Game = new function () {
         folded: false,
         allIn: false,
         ghost: false,
-        motes: []
+        motes: [],
+        wager: 0
       }
       for (var j = 0; j < (game.startMotes - game.motesPerRound); j++) {
         game.players[i].motes.push(10); // 10 is just a placeholder value
@@ -159,14 +160,32 @@ var Game = new function () {
       return 0;
     }
 
-    var betSize = Math.floor(game.roundStartMana[pNum] * (player.betCount + 1) / 7);
-    if (betSize == 0 && player.motes.length > 0) {
+    var betSize = Math.floor(game.roundStartMana[pNum] / 7);
+
+    console.log("betSize = " + betSize);
+
+    if (betSize == 0) {
       betSize = 1;
     } else if (betSize > game.forceEndBetSize) {
       betSize = game.forceEndBetSize;
     }
 
+    console.log("betSize = " + betSize);
+
+    // seventh bet is always all-in
+    if (player.betCount + 1 >= 7) {
+      betSize = player.motes.length;
+    }
+
+    console.log("betSize = " + betSize);
+
+    if (betSize > player.motes.length) {
+      alert("betSize is impossibly large at " + betSize + " vs " + player.motes.length);
+    }
+
     player.betCount += 1;
+    player.wager += betSize;
+
     sendMotesToWarp(pNum, betSize);
     // var mote = player.motes.pop();
     // game.warpMotes.push(mote);
@@ -401,20 +420,21 @@ var Game = new function () {
 
   function meet(pNum) {
     var player = game.players[pNum];
-    var diff = game.maxBetCount - player.betCount;
+    var diff = game.maxWager - player.wager;
 
     if (player.folded || player.allIn || diff == 0) {
       return 0;
     }
 
-    while (diff > 0 && player.motes.length > 0) {
-      player.betCount += 1;
-      diff -= 1;
-      var mote = player.motes.pop();
-      game.warpMotes.push(mote);
-      if (game.render) {
-        game.painter.animateBet(pNum);
-      }
+    var amount = diff;
+    if (player.motes.length < amount) {
+      amount = player.motes.length;
+    }
+
+    player.wager += amount;
+    sendMotesToWarp(pNum, amount);
+    if (game.render) {
+      game.painter.animateBet(pNum, amount);
     }
 
     console.log(player.name + " calls@meet with " + player.motes.length + " remaining.");
@@ -492,7 +512,7 @@ var Game = new function () {
         continue;
       }
       player.thisStageBet = 0;
-      player.betCount = 0;
+      // player.betCount = 0;
     }
 
     var betByXFn = function (x) {
@@ -526,13 +546,13 @@ var Game = new function () {
 
     var players = game.players;
 
-    var maxBetCount = 0;
+    var maxWager = 0;
     for (var i = 1; i <= 8; i++) {
-      if (!players[i].folded && players[i].betCount > maxBetCount) {
-        maxBetCount = players[i].betCount;
+      if (!players[i].folded && players[i].wager > maxWager) {
+        maxWager = players[i].wager;
       }
     }
-    game.maxBetCount = maxBetCount;
+    game.maxWager = maxWager;
 
     // alert('completed startMatchStage');
     triggerByClock(endMatchStage, game.clock.matchStage);
@@ -564,10 +584,12 @@ var Game = new function () {
       var player = game.players[i];
       player.allIn = false;
       player.folded = false;
+      player.betCount = 0;
+      player.wager = 0;
       var gain = game.motesPerRound;
-      if (player.ghost) {
-        gain = Math.ceil(gain * 4 / 7);
-      }
+      // if (player.ghost) {
+      //   gain = Math.ceil(gain * 4 / 7);
+      // }
       if (player.motes.length >= 250) {
         console.log("!! " + player.name + " has " + player.motes.length + " mana.")
         // gain = 0;
