@@ -51,10 +51,10 @@ var Game = new function () {
     motesPerRound: 7,
     render: false,
     painter: null,
-    clock: clocks.normal,
+    clock: clocks.fast,
     newAllIns: [],
     sidePots: [],
-    baseDamageMod: 100
+    baseDamageMod: 7
   }
 
   this.begin = function () {
@@ -180,7 +180,9 @@ var Game = new function () {
     console.log("betSize = " + betSize);
 
     if (betSize > player.motes.length) {
-      alert("betSize is impossibly large at " + betSize + " vs " + player.motes.length);
+      // this DOES trigger, make sure to check this out later
+      // alert("betSize is impossibly large at " + betSize + " vs " + player.motes.length);
+      betSize = player.motes.length;
     }
 
     player.betCount += 1;
@@ -221,6 +223,9 @@ var Game = new function () {
   }
 
   function createSidePot(requirement, outstanding) {
+
+    console.log("running createSidePot for " + requirement + ", " + outstanding);
+
     if (requirement == 0) {
       alert("Error: requirement 0 in createSidePot");
       return;
@@ -230,6 +235,7 @@ var Game = new function () {
       // went all-in with exactly the same amount of mana.
       // The first side-pot handles their wager completely,
       // so don't create another
+      console.log("returning due to outstanding = 0");
       return;
     }
     var eligible = [];
@@ -247,12 +253,14 @@ var Game = new function () {
     var amount = null;
     if (requirement == outstanding) {
       // this is the first sidePot being created within this stage
-      amount = game.roundStartMana[0];
+      amount = game.stageStartMana;
       amount += eligible.length * requirement;
     } else {
       amount = 0;
       amount += eligible.length * outstanding;
     }
+
+    console.log("Transferring " + amount + " from warp to side pot");
 
     var transfer = game.warpMotes.slice(0, amount);
     game.warpMotes = game.warpMotes.slice(amount, Infinity);
@@ -357,6 +365,10 @@ var Game = new function () {
     var player = game.players[pNum];
 
     if (player.folded || player.allIn) {
+      return 0;
+    }
+
+    if (player.wager >= game.maxWager) {
       return 0;
     }
 
@@ -503,6 +515,7 @@ var Game = new function () {
       Magnetic.resetMaxMarked();
     }
 
+    game.maxWager = 0;
     for (var i = 1; i <= 8; i++) {
       var player = game.players[i];
       if (player.folded) {
@@ -568,7 +581,8 @@ var Game = new function () {
     console.log('~~~ ROUND ' + game.rounds + ' START! ~~~');
     game.captureTo = null;
     game.sidePots = [];
-    game.roundStartMana = [game.warpMotes.length, 0, 0, 0, 0, 0, 0, 0, 0];
+    game.roundStartMana = [null, 0, 0, 0, 0, 0, 0, 0, 0];
+    game.stageStartMana = 0;
 
     if (game.render) {
       Magnetic.unhiliteAllParticles();
@@ -625,6 +639,7 @@ var Game = new function () {
 
   function startStage() {
     game.newAllIns.length = 0;
+    game.stageStartMana = game.warpMotes.length;
     switch (game.stage) {
       case 0:
         // flop

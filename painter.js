@@ -59,7 +59,7 @@ var Painter = new function () {
     if (teamOneWins && teamTwoWins) {
       message = 'TIED'
     } else if (teamTwoWins) {
-      message = 'DEAFEAT'
+      message = 'DEFEAT'
     }
     document.getElementById('end-game-report').innerHTML = message;
     document.getElementById('end-game-report-box').classList.add('show');
