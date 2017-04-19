@@ -324,11 +324,10 @@ body {
 
 #bet-count-overlay {
   position: absolute;
-  background-color: magenta;
+  background-color: navy;
   height: 0%;
   width: 100%;
   bottom: 0px;
-  z-index: 1000;
   border-radius: 13% 13% 13% 13%
 }
 

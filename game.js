@@ -51,10 +51,10 @@ var Game = new function () {
     motesPerRound: 7,
     render: false,
     painter: null,
-    clock: clocks.fast,
+    clock: clocks.normal,
     newAllIns: [],
     sidePots: [],
-    baseDamageMod: 7
+    baseDamageMod: 5
   }
 
   this.begin = function () {
@@ -173,7 +173,7 @@ var Game = new function () {
     console.log("betSize = " + betSize);
 
     // seventh bet is always all-in
-    if (player.betCount + 1 >= 7) {
+    if ((player.betCount + 1 >= 7) && (player.motes.length - betSize < 3)) {
       betSize = player.motes.length;
     }
 
@@ -192,16 +192,17 @@ var Game = new function () {
     // var mote = player.motes.pop();
     // game.warpMotes.push(mote);
 
-    if (game.render) {
-      game.painter.animateBet(pNum, player.betCount, betSize);
-    }
-
     console.log(player.name + " bets " + betSize + " with " +  player.motes.length + " remaining.")
 
     if (player.motes.length == 0) {
       console.log("set " + pNum + " " + player.name + " all-in @bet.");
       setAllIn(pNum);
+      player.betCount = 7;
       checkForCapture();
+    }
+
+    if (game.render) {
+      game.painter.animateBet(pNum, player.betCount, betSize);
     }
 
     return 1;
@@ -972,6 +973,9 @@ var Game = new function () {
     while (game.sidePots.length > 0) {
 
       var sidePot = game.sidePots.pop();
+
+      console.log("sidePot = ");
+      console.log(sidePot);
 
       var winners = findWinners(sidePot);
 
