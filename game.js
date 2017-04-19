@@ -51,7 +51,7 @@ var Game = new function () {
     motesPerRound: 7,
     render: false,
     painter: null,
-    clock: clocks.fast,
+    clock: clocks.normal,
     newAllIns: [],
     sidePots: [],
     baseDamageMod: 100
@@ -191,7 +191,7 @@ var Game = new function () {
     // game.warpMotes.push(mote);
 
     if (game.render) {
-      game.painter.animateBet(pNum, betSize);
+      game.painter.animateBet(pNum, player.betCount, betSize);
     }
 
     console.log(player.name + " bets " + betSize + " with " +  player.motes.length + " remaining.")
@@ -291,8 +291,7 @@ var Game = new function () {
     }
 
     var players = game.players;
-
-    var maxBetCount = game.maxBetCount;
+    var maxWager = game.maxWager;
 
     //at endMatchStage, all undecided players automatically meet
     for (var i = 1; i <= 8; i++) {
@@ -301,10 +300,8 @@ var Game = new function () {
         continue;
       }
 
-      if (player.betCount < maxBetCount) {
-        if (player.betCount < maxBetCount && player.motes.length > 0) {
-          meet(i);
-        }
+      if (player.wager < maxWager && player.motes.length > 0) {
+        meet(i);
       }
     }
 
@@ -434,7 +431,7 @@ var Game = new function () {
     player.wager += amount;
     sendMotesToWarp(pNum, amount);
     if (game.render) {
-      game.painter.animateBet(pNum, amount);
+      game.painter.animateBet(pNum, 0, amount);
     }
 
     console.log(player.name + " calls@meet with " + player.motes.length + " remaining.");
@@ -601,6 +598,8 @@ var Game = new function () {
       if (player.motes.length >= topStack) {
         secondStack = topStack;
         topStack = player.motes.length;
+      } else if (player.motes.length > secondStack) {
+        secondStack = player.motes.length;
       }
 
       game.roundStartMana[i] = player.motes.length;
@@ -614,6 +613,13 @@ var Game = new function () {
     game.forceEndWager = secondStack;
     game.forceEndBetSize = Math.ceil(game.forceEndWager / 7);
 
+    console.log("forceEndWager = " + game.forceEndWager);
+    console.log("forceEndBetSize = " + game.forceEndBetSize);
+
+    if (game.forceEndBetSize == 0) {
+      alert('Error: forceEnd = 0');
+    }
+
     console.log("roundStartMana: " + game.roundStartMana);
   }
 
@@ -626,6 +632,7 @@ var Game = new function () {
         hideAllCards();
         shuffleCards();
         if (game.render) {
+          game.painter.zeroBetOverlay();
           game.painter.showPersonalCardsFor([1], game.cards);
           game.painter.showFlopCards(game.cards);
         }

@@ -47,7 +47,10 @@ var Painter = new function () {
     document.getElementById('progress-bar-fill').classList.add('match-stage');
   }
 
-  this.animateBet = function (pNum, betSize) {
+  this.animateBet = function (pNum, betCount, betSize) {
+    if (pNum == 1 && betCount > 0) {
+      document.getElementById('bet-count-overlay').classList.add('count-' + betCount);
+    }
     Magnetic.hiliteMagnetParticles(pNum, betSize);
   }
 
@@ -114,6 +117,10 @@ var Painter = new function () {
       document.getElementById("player-element-" + id1).classList.add(cards[slot1] + '-orb');
       document.getElementById("player-element-" + id2).classList.add(cards[slot2] + '-orb');
     }
+  }
+
+  this.zeroBetOverlay = function () {
+    document.getElementById('bet-count-overlay').className = "";
   }
 
   function revealElements(nums, cards) {

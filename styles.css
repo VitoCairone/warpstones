@@ -67,9 +67,9 @@ body {
   margin: 6px 9% 6px 4%; 
 }
 
-.action-button {
+/*.action-button {
   background-color: navy;
-}
+}*/
 
 .spell-button {
   position: absolute;
@@ -320,6 +320,44 @@ body {
   position: absolute;
   top: 160px;
   right: 70px;
+}
+
+#bet-count-overlay {
+  position: absolute;
+  background-color: magenta;
+  height: 0%;
+  width: 100%;
+  bottom: 0px;
+  z-index: 1000;
+  border-radius: 13% 13% 13% 13%
+}
+
+#bet-count-overlay.count-1 {
+  height: 14.2%;
+}
+
+#bet-count-overlay.count-2 {
+  height: 28.5%;
+}
+
+#bet-count-overlay.count-3 {
+  height: 42.8%;
+}
+
+#bet-count-overlay.count-4 {
+  height: 57.1%;
+}
+
+#bet-count-overlay.count-5 {
+  height: 71.4%;
+}
+
+#bet-count-overlay.count-6 {
+  height: 85.7%;
+}
+
+#bet-count-overlay.count-7 {
+  height: 100%;
 }
 
 .sprite {
