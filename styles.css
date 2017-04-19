@@ -331,6 +331,19 @@ body {
   border-radius: 13% 13% 13% 13%
 }
 
+#defend-overlay {
+  position: absolute;
+  background-color: navy;
+  height: 0%;
+  width: 100%;
+  bottom: 0px;
+  border-radius: 13% 13% 13% 13% 
+}
+
+#defend-overlay.defend {
+  height: 100%;
+}
+
 #bet-count-overlay.count-1 {
   height: 14.2%;
 }

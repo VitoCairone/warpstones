@@ -287,7 +287,15 @@ var Game = new function () {
 
   function decideBets(pNum) {
     // in this stub, pNum is actually unused
-    return Math.floor(Math.random() * 5) - 2;
+    // split up decision making so that stage 1
+    // doesn't go force all-in so often
+    if (Math.random() > 0.3) {
+      //aggro
+      return Math.floor(Math.random() * 10) - 2;
+    } else {
+      //normal
+      return Math.floor(Math.random() * 7) - 2;
+    }
   }
 
   function endSpellCastingStage() {
@@ -460,8 +468,9 @@ var Game = new function () {
 
     player.wager += amount;
     sendMotesToWarp(pNum, amount);
+    var betCount = (player.motes.length == 0 ? 7 : 0)
     if (game.render) {
-      game.painter.animateBet(pNum, 0, amount);
+      game.painter.animateBet(pNum, betCount, amount);
     }
 
     console.log(player.name + " calls@meet with " + player.motes.length + " remaining.");

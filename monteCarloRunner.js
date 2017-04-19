@@ -2,6 +2,9 @@ var cards = [];
 
 var elements = ['earth', 'fire', 'air', 'water', 'ice', 'dark', 'light'];
 
+var scoreOccurHash = {};
+var scoreOccurTotal = 0;
+
 for (var i = 0; i < 7; i++) {
   cards = cards.concat(elements);
 }
@@ -47,21 +50,21 @@ function gestaltRank(gestalt) {
   return score;
 }
 
-function shuffle (array) {
+function shuffle () {
   //Fisher-Yates shuffle
   var i = 0
     , j = 0
     , temp = null;
 
-  for (i = array.length - 1; i > 0; i -= 1) {
+  for (i = cards.length - 1; i > 0; i -= 1) {
     j = Math.floor(Math.random() * (i + 1))
-    temp = array[i]
-    array[i] = array[j]
-    array[j] = temp
+    temp = cards[i]
+    cards[i] = cards[j]
+    cards[j] = temp
   }
 }
 
-function findWinners() {
+function findTopScore() {
   var score = 0;
   var topScore = 0;
   for (var i = 1; i <= 8; i++) {
@@ -75,7 +78,12 @@ function findWinners() {
 }
 
 function printOutOdds() {
-  var scores = Objects.keys(scoreOccurHash);
+  var scores = Object.keys(scoreOccurHash);
+
+  scores.sort(function (a, b) {
+    return scoreOccurHash[b] - scoreOccurHash[a];
+  });
+
   for (var i = 0; i < scores.length; i++) {
     freq = scoreOccurHash[scores[i]] / scoreOccurTotal;
     odds = 1.0 / freq;
@@ -84,10 +92,181 @@ function printOutOdds() {
     } else {
       odds = Math.floor(odds * 10) / 10;
     }
-    console.log(score + ': 1 in ' + odds);
+    console.log(scores[i] + ': 1 in ' + odds);
   }
 }
 
-function main() {
-  console.log('hello!');
-}
+/*
+20,000,000 run results, w/ builtin rand
+Winning gestalts
+Some quick notes:
+  60% are #1, #2, or #3
+  4s about 1/8;
+  Void about 1/14;
+
+#1
+Full House
+112: 1 in 3.1
+
+#2
+Trips
+104: 1 in 5.8
+
+#3
+Two Pair
+23: 1 in 9.4
+
+#4
+Fours
+1003: 1 in 15
+
+#5
+Four and Pair
+1011: 1 in 20
+
+#6
+Trips two Pair
+120: 1 in 22
+
+#7
+Trips +Spirit
+105: 1 in 27
+
+#8
+Void over Pair
+1000000023: 1 in 30
+
+#9
+Full House +Spirit
+113: 1 in 34
+
+#10
+Two Pair +Spirit
+24: 1 in 39
+
+#11
+Two Trips 
+201: 1 in 39
+
+#12
+Three Pair
+31: 1 in 44
+
+#13
+Void over Two Pair
+1000000031: 1 in 80
+
+#14
+Void alone
+1000000015: 1 in 90
+
+#15
+Void over Trips
+1000000112: 1 in 121
+
+#16
+Fours +Spirit
+1004: 1 in 134
+
+#17
+Fives
+10002: 1 in 180
+
+#18
+Pair +Spirit
+16: 1 in 212
+
+#19
+Void over Pair +Spirit
+1000000024: 1 in 262
+
+#20
+Void +Spirit
+1000000016: 1 in 378
+
+#21
+Fours and Trips
+1100: 1 in 395
+
+#22
+Pair
+15: 1 in 426
+
+#23
+Void over Full House
+1000000120: 1 in 605
+
+#24
+Fours and Pair
+1012: 1 in 662
+
+#25
+Three Pair +Spirit
+32: 1 in 827
+
+#26
+Fives and Pair
+10010: 1 in 962
+
+#27
+Two Trips +Spirit
+202: 1 in 1,329
+
+#28
+Void over Fours
+1000001011: 1 in 1,784
+
+#29
+Void over Trips +Spirit
+1000000113: 1 in 1,943
+
+#30
+Void over Two Pair +Spirit
+1000000032: 1 in 2,578
+
+#31
+Fives +Spirit
+10003: 1 in 3,047
+
+#32
+Sixes
+100001: 1 in 8,532
+
+#33
+Void over Fours +Spirit
+1000001012: 1 in 65,789
+
+#34
+Void over Fives 
+1000010010: 1 in 106,951
+
+#35
+Sixes +Spirit
+100002: 1 in 370,370
+
+#36
+Sevens
+1000000: 1 in 4,000,000
+
+#37
+Rainbow
+7: nearly impossible without folds
+*/
+
+(function main() {
+  for (var i = 0; i < 100000000; i++) {
+    if (i > 0 && i % 10000 == 0) {
+      console.log("Ran " + i);
+    }
+    shuffle();
+    var score = findTopScore();
+    if (score in scoreOccurHash) {
+      scoreOccurHash[score]++;
+    } else {
+      scoreOccurHash[score] = 1;
+    }
+    scoreOccurTotal++;
+  }
+
+  printOutOdds();
+})();

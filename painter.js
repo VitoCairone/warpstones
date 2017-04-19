@@ -82,6 +82,9 @@ var Painter = new function () {
   }
 
   this.animateFold = function (pNum) {
+    if (pNum == 1) {
+      document.getElementById('defend-overlay').classList.add('defend');
+    }
     Magnetic.contractParticles(pNum);
   }
 
@@ -121,6 +124,7 @@ var Painter = new function () {
 
   this.zeroBetOverlay = function () {
     document.getElementById('bet-count-overlay').className = "";
+    document.getElementById('defend-overlay').className = "";
   }
 
   function revealElements(nums, cards) {
