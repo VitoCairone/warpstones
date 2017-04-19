@@ -54,7 +54,8 @@ var Game = new function () {
     clock: clocks.normal,
     newAllIns: [],
     sidePots: [],
-    baseDamageMod: 5
+    baseDamageMod: 5,
+    inputPhase: null
   }
 
   this.begin = function () {
@@ -64,11 +65,15 @@ var Game = new function () {
   }
 
   this.pressFold = function () {
-    fold(1);
+    if (game.inputPhase == 'bet' || game.inputPhase == 'match') {
+      fold(1);
+    }
   }
 
   this.pressBet = function () {
-    bet(1);
+    if (game.inputPhase == 'bet') {
+      bet(1);
+    }
   }
 
   this.pressSpellLock = function () {
@@ -172,8 +177,8 @@ var Game = new function () {
 
     console.log("betSize = " + betSize);
 
-    // seventh bet is always all-in
-    if ((player.betCount + 1 >= 7) && (player.motes.length - betSize < 3)) {
+    // seventh bet should generally be all-in
+    if ((player.betCount + 1 >= 7) && (player.motes.length <= game.forceEndBetSize)) {
       betSize = player.motes.length;
     }
 
@@ -274,7 +279,7 @@ var Game = new function () {
 
   function decideBets(pNum) {
     // in this stub, pNum is actually unused
-    return Math.floor(Math.random() * 9) - 2;
+    return Math.floor(Math.random() * 5) - 2;
   }
 
   function endSpellCastingStage() {
@@ -294,6 +299,8 @@ var Game = new function () {
   }
 
   function endMatchStage() {
+
+    game.inputPhase = null;
 
     if (game.render) {
       game.painter.animateResetTimerBar();
@@ -511,6 +518,8 @@ var Game = new function () {
 
     console.log("~ BET STAGE " + game.stage + " START ~");
 
+    game.inputPhase = 'bet';
+
     if (game.render) {
       game.painter.animateBetTimerBar();
       Magnetic.resetMaxMarked();
@@ -551,6 +560,8 @@ var Game = new function () {
 
   function startMatchStage() {  
 
+    game.inputPhase = 'match';
+
     if (game.render) {
       game.painter.animateMatchTimerBar();
     }
@@ -584,6 +595,7 @@ var Game = new function () {
     game.sidePots = [];
     game.roundStartMana = [null, 0, 0, 0, 0, 0, 0, 0, 0];
     game.stageStartMana = 0;
+    game.inputPhase = null;
 
     if (game.render) {
       Magnetic.unhiliteAllParticles();
