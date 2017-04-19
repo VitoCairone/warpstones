@@ -65,9 +65,7 @@ var Game = new function () {
   }
 
   this.pressFold = function () {
-    if (game.inputPhase == 'bet' || game.inputPhase == 'match') {
-      fold(1);
-    }
+    fold(1);
   }
 
   this.pressBet = function () {
@@ -211,6 +209,16 @@ var Game = new function () {
     }
 
     return 1;
+  }
+
+  // check is the action of the 'middle button'
+  // during bet phase; the one which becomes Meet.
+  // once Bet is disabled.
+  // Check means: no intent to bet more, okay to
+  // proceed. So, check is NOT implicit behavior
+  // of the fold button, which always fold.
+  function check(pNum) {
+    ;
   }
 
   function checkForCapture() {
@@ -376,7 +384,9 @@ var Game = new function () {
       return 0;
     }
 
-    if (player.wager >= game.maxWager) {
+    if (player.wager >= game.maxWager && player.thisStageBet > 0) {
+      alert('cannot fold as betting top better (NYI)');
+      //returnUnmetWager(pNum);
       return 0;
     }
 
