@@ -97,12 +97,15 @@ function printOutOdds() {
 }
 
 /*
-20,000,000 run results, w/ builtin rand
+100,000,000 run results, w/ builtin rand
 Winning gestalts
 Some quick notes:
-  60% are #1, #2, or #3
-  4s about 1/8;
-  Void about 1/14;
+  60% are Full House, Trips, or Two Pair
+  4s about 1/8 = about 3 each game;
+  Void about 1/14 = about 1.5 each game;
+  5s about 1/150 = about 1 in 7 games (1 hour);
+  6s about 1/8000 = about 1 in 365 games (45 hours);
+  7s about 1/2.7M = about 1 in 120,000 games (1.7 player-years);
 
 #1
 Full House
@@ -170,7 +173,7 @@ Fours +Spirit
 
 #17
 Fives
-10002: 1 in 180
+10002: 1 in 179
 
 #18
 Pair +Spirit
@@ -178,75 +181,75 @@ Pair +Spirit
 
 #19
 Void over Pair +Spirit
-1000000024: 1 in 262
+1000000024: 1 in 261
 
 #20
 Void +Spirit
-1000000016: 1 in 378
+1000000016: 1 in 380
 
 #21
 Fours and Trips
-1100: 1 in 395
+1100: 1 in 396
 
 #22
 Pair
-15: 1 in 426
+15: 1 in 425
 
 #23
 Void over Full House
-1000000120: 1 in 605
+1000000120: 1 in 604
 
 #24
 Fours and Pair
-1012: 1 in 662
+1012: 1 in 666
 
 #25
 Three Pair +Spirit
-32: 1 in 827
+32: 1 in 826
 
 #26
 Fives and Pair
-10010: 1 in 962
+10010: 1 in 958
 
 #27
 Two Trips +Spirit
-202: 1 in 1,329
+202: 1 in 1,351
 
 #28
 Void over Fours
-1000001011: 1 in 1,784
+1000001011: 1 in 1,764
 
 #29
 Void over Trips +Spirit
-1000000113: 1 in 1,943
+1000000113: 1 in 1,952
 
 #30
 Void over Two Pair +Spirit
-1000000032: 1 in 2,578
+1000000032: 1 in 2,554
 
 #31
 Fives +Spirit
-10003: 1 in 3,047
+10003: 1 in 3,031
 
 #32
 Sixes
-100001: 1 in 8,532
+100001: 1 in 8,231
 
 #33
 Void over Fours +Spirit
-1000001012: 1 in 65,789
+1000001012: 1 in 71,787
 
 #34
 Void over Fives 
-1000010010: 1 in 106,951
+1000010010: 1 in 112,107
 
 #35
 Sixes +Spirit
-100002: 1 in 370,370
+100002: 1 in 332,225
 
 #36
 Sevens
-1000000: 1 in 4,000,000
+1000000: 1 in 2,702,702
 
 #37
 Rainbow
@@ -254,7 +257,7 @@ Rainbow
 */
 
 (function main() {
-  for (var i = 0; i < 100000000; i++) {
+  for (var i = 0; i < 22; i++) {
     if (i > 0 && i % 10000 == 0) {
       console.log("Ran " + i);
     }

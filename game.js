@@ -51,11 +51,12 @@ var Game = new function () {
     motesPerRound: 7,
     render: false,
     painter: null,
-    clock: clocks.normal,
+    clock: clocks.fast,
     newAllIns: [],
     sidePots: [],
-    baseDamageMod: 5,
-    inputPhase: null
+    baseDamageMod: 7,
+    inputPhase: null,
+    teamOneWinRecord: [0, 0]
   }
 
   this.begin = function () {
@@ -111,6 +112,8 @@ var Game = new function () {
     console.log("######################################");
     console.log("######################################");
     console.log("###### baseDamageMod set to " + game.baseDamageMod);
+    console.log("###### team1 win record " + game.teamOneWinRecord[0] + "-" + game.teamOneWinRecord[1]);
+    console.log("#######################################");
   }
 
   function reset() {
@@ -165,7 +168,7 @@ var Game = new function () {
 
     var betSize = Math.floor(game.roundStartMana[pNum] / 7);
 
-    console.log("betSize = " + betSize);
+    // console.log("betSize = " + betSize);
 
     if (betSize == 0) {
       betSize = 1;
@@ -173,14 +176,14 @@ var Game = new function () {
       betSize = game.forceEndBetSize;
     }
 
-    console.log("betSize = " + betSize);
+    // console.log("betSize = " + betSize);
 
     // seventh bet should generally be all-in
     if ((player.betCount + 1 >= 7) && (player.motes.length <= game.forceEndBetSize)) {
       betSize = player.motes.length;
     }
 
-    console.log("betSize = " + betSize);
+    // console.log("betSize = " + betSize);
 
     if (betSize > player.motes.length) {
       // this DOES trigger, make sure to check this out later
@@ -298,6 +301,16 @@ var Game = new function () {
     }
   }
 
+  function decidingPlayerCount() {
+    var count = 0;
+    for (var i = 1; i <= 8; i++) {
+      if (!game.players[i].allIn && !game.players[i].folded) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   function endSpellCastingStage() {
     if (detectWinCondition()) {
       endGame();
@@ -389,6 +402,11 @@ var Game = new function () {
     var player = game.players[pNum];
 
     if (player.folded || player.allIn) {
+      return 0;
+    }
+
+    // cannot fold as the only player who is not already all-in
+    if (decidingPlayerCount() == 1) {
       return 0;
     }
 
@@ -559,7 +577,10 @@ var Game = new function () {
     }
 
     // skip player 1; let interface control
-    for (var i = 2; i <= 8; i++) {
+
+    // ACTUALLY for now decide orders for 1 automatically also
+    // dangerous!
+    for (var i = 1; i <= 8; i++) {
       var player = game.players[i];
       if (player.folded || player.allIn) {
         continue;
@@ -705,9 +726,13 @@ var Game = new function () {
       case 3:
         //showdown
         if (game.render) {
+          // show the Turn and River again here, in case we
+          // skipped forward in a captured round
+          game.painter.showTurnCards(game.cards);
+          game.painter.showRiverCard(game.cards);
           showContestCards();
         }
-        //showWinners();
+
         showdown();
         break;
       case 4:
@@ -775,6 +800,7 @@ var Game = new function () {
       var message = 'game ended in ' + game.rounds + ' rounds';
       console.log(message);
 
+      game.teamOneWinRecord[teamOneAlive ? 0 : 1]++;
       autoAdjustDamageMod();
 
       if (game.render) {
@@ -1134,7 +1160,14 @@ var Game = new function () {
       console.log(player.name + ' cast Boo!')
     } else {
       spellName = 'Force Blast';
-      moteSpend = Math.ceil(player.motes.length * 0.5);
+
+      if (pNum <= 4) {
+        // leeft team casts at 1/3
+        moteSpend = Math.ceil(player.motes.length / 3);
+      } else {
+        // right team casts at 2/3
+        moteSpend = Math.ceil(player.motes.length * 2 / 3);
+      }
 
       // First, destruct particles
 
