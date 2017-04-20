@@ -488,7 +488,12 @@ var Game = new function () {
     sendMotesToWarp(pNum, amount);
     var betCount = (player.motes.length == 0 ? 7 : 0)
     if (game.render) {
+      
       game.painter.animateBet(pNum, betCount, amount);
+      // window.setTimeout(function () { 
+      //   game.painter.animateBet(pNum, betCount, amount);
+      // }, Math.round(Math.random() * 250));
+      
     }
 
     console.log(player.name + " calls@meet with " + player.motes.length + " remaining.");

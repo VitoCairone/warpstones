@@ -98,14 +98,19 @@ Magnetic = new function() {
     maxMarkedParticles = 0;
   }
 
-  this.transferMarkedParticles = function (from, to) {
+  this.transferMarkedParticles = function (from, to, timeRange) {
     var magnet = magnets[from];
     var magnetTo = magnets[to];
     for (var i = 0; i < magnet.markedParticles; i++) {
       var particle = magnet.particles.shift();
       magnetTo.particles.unshift(particle);
       particle.magnet = magnetTo;
-      particle.timeToArrival = Math.round(30 + Math.random() * 30);
+      if (typeof timeRange !== 'undefined') {
+        var diff = timeRange[1] - timeRange[0];
+        particle.timeToArrival = Math.round(timeRange[0] + Math.random() * diff);
+      } else {
+        particle.timeToArrival = Math.round(30 + Math.random() * 30);
+      }
     }
     magnet.markedParticles = 0;
   }
@@ -279,17 +284,23 @@ Magnetic = new function() {
           // if( fy > -MAGNETIC_FORCE_THRESHOLD && fy < MAGNETIC_FORCE_THRESHOLD ) {
             force.y += fy / MAGNETIC_FORCE_THRESHOLD;
           // }
-
         }
 
-        var orbitPush = 1;
+        var orbitPushTarget = 1;
         if (j == 0) {
           // who once where high shall now be low
-          orbitPush = 1.0 - (particle.force - 2.1) * 2;
+          orbitPushTarget = 1.0 - (particle.force - 2.1) * 2;
         } else if (magnet.orbit > LOW_ORBIT && i < maxMarkedParticles) {
-          // render a higher orbit for particles below the max wager
-          orbitPush = HIGH_ORBIT / NORMAL_ORBIT;
+          // render a higher orbit for particles under the max wager, that is,
+          // particles which must be spent to go on
+          orbitPushTarget = HIGH_ORBIT / NORMAL_ORBIT;
         }
+        if (particle.orbitPush != orbitPushTarget) {
+          // assumes reasonably many FPS, like around 60
+          particle.orbitPush = 0.95 * particle.orbitPush + 0.05 * orbitPushTarget;
+        }
+        var orbitPush = particle.orbitPush;
+
         
         // Rotation
         particle.angle += particle.speed;
@@ -449,6 +460,7 @@ function Particle() {
   this.magnet = null;
   this.betGlowFrames = 0;
   this.timeToArrival = 0;
+  this.orbitPush = 1;
 }
 
 function Magnet() {
