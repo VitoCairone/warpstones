@@ -204,7 +204,7 @@ Magnetic = new function() {
 
       var position = {
         x: 35,
-        y: 118 + 37 * (i % 4)
+        y: 40 + 20 * (i % 4)
         // x: ( SCREEN_WIDTH - w ) * 0.5 + (Math.random() * w), 
         // y: ( SCREEN_HEIGHT - h ) * 0.5 + (Math.random() * h)
       };

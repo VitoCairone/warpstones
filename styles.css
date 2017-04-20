@@ -392,7 +392,7 @@ body {
 }
 
 .top-row {
-  top: 40px;
+  top: 0px;
 }
 
 .mid-top-row {
@@ -465,22 +465,6 @@ body {
 #foeTeamBox .damage-popup {
   right: 35px;
 }
-
-/*.damage-popup.top-row {
-  top: 40px;
-}
-
-.damage-popup.mid-top-row {
-  top: 80px;
-}
-
-.damage-popup.mid-bot-row {
-  top: 120px;
-}
-
-.damage-popup.bot-row {
-  top: 160px;
-}*/
 
 .damage-popup.reporting {
   transition-property: margin-top;
