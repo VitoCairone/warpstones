@@ -190,6 +190,7 @@ Magnetic = new function() {
     nextParticleId = 0;
     maxMarkedParticles = 0;
     createMagnets();
+    windowResizeHandler();
   }
 
   function createMagnets() {
