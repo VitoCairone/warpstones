@@ -54,7 +54,7 @@ var Game = new function () {
     clock: clocks.fast,
     newAllIns: [],
     sidePots: [],
-    baseDamageMod: 4.3,
+    baseDamageMod: 5.4,
     inputPhase: null,
     teamOneWinRecord: [0, 0]
   }
@@ -732,7 +732,6 @@ var Game = new function () {
           game.painter.showRiverCard(game.cards);
           showContestCards();
         }
-
         showdown();
         break;
       case 4:
@@ -1059,10 +1058,38 @@ var Game = new function () {
 
   function showdown() {
     if (reporting('stages')) console.log('showdown');
+
+    // Showdown, spellLocking, and spellCasting
+    // follow a strict order of events, where each step after 0
+    // should read to begin 'upon completion of previous step'
+    
+    // 0: reveal all personal orbs, allow game.clock.viewOrbs time to see
+    // 1: distribute mana, allowing game.clock.awardMana time to move
+
+    // after showdown, it is time to enter spellLocking stage,
+    // which coninues:
+
+    // 2: spend mana, allowing game.clock.spendMana (maybe 0!) time to spend
+    // 3: calculate spell parameters and animate windup
+
+    // spellLocking also has an input phase of game.clock.spellLocking
+    // duration. During this time, selecting a spell will start its windup,
+    // and spellLocking exit when that windup completes. If no choice
+    // is made, the windup will still run, so a passive default choice
+    // takes game.clock.spellLocking + windup time. It is a good idea
+    // to have windups which are just a pose change, proceeding immediately
+    // to spellCasting.
+
+    // after spellLocking, it is time to enter spellCasting stage,
+    // which continues:
+
+    // 4: animate movement of projectile(s) or other inflight effects
+    // 5: animate damage popup over game.clock.damagePopup and apply damage
+    // 6: feint if required
+
     var completeShowdown = function () {
       var winnings = sendManaToWinners();
       if (game.render) {
-        // MUST CHANGE IN MAGNETIC !!
         Magnetic.distributeParticles(winnings);
       }
 
@@ -1072,19 +1099,6 @@ var Game = new function () {
           game.winners.push(i);
         }
       }
-
-      // var winners = game.winners;
-      // var winnings = game.winnings;
-
-      // var counterSync = Math.floor(Math.random() * winners.length);
-
-      // distribute motes evenly to winners
-      // var count = counterSync;
-      // while (game.warpMotes.length > 0) {
-      //   var mote = game.warpMotes.pop();
-      //   game.players[winners[count]].motes.push(mote);
-      //   count = (count + 1) % winners.length;
-      // }
 
       triggerByClock(advanceStage, game.clock.spellLocking);
     }
