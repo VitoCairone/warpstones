@@ -109,31 +109,31 @@ Some quick notes:
 
 #1
 Full House
-112: 1 in 3.1
+112: 1 in 3.1     to 0.32
 
 #2
 Trips
-104: 1 in 5.8
+104: 1 in 5.8     to 0.49
 
 #3
 Two Pair
-23: 1 in 9.4
+23: 1 in 9.4      to 0.60
 
 #4
 Fours
-1003: 1 in 15
+1003: 1 in 15     to 0.67
 
 #5
-Four and Pair
-1011: 1 in 20
+Four and Pair     
+1011: 1 in 20     to 0.72
 
 #6
-Trips two Pair
-120: 1 in 22
+Trips two Pair    
+120: 1 in 22      to 0.76
 
 #7
-Trips +Spirit
-105: 1 in 27
+Trips +Spirit   
+105: 1 in 27      to 0.80
 
 #8
 Void over Pair

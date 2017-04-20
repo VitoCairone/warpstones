@@ -54,7 +54,7 @@ var Game = new function () {
     clock: clocks.fast,
     newAllIns: [],
     sidePots: [],
-    baseDamageMod: 7,
+    baseDamageMod: 4.3,
     inputPhase: null,
     teamOneWinRecord: [0, 0]
   }

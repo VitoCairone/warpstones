@@ -391,19 +391,19 @@ body {
      to { background-position-x: -120px; }
 }
 
-.sprite.top-row {
+.top-row {
   top: 40px;
 }
 
-.sprite.mid-top-row {
+.mid-top-row {
   top: 80px;
 }
 
-.sprite.mid-bot-row {
+.mid-bot-row {
   top: 120px;
 }
 
-.sprite.bot-row {
+.bot-row {
   top: 160px;
 }
 
@@ -466,7 +466,7 @@ body {
   right: 35px;
 }
 
-.damage-popup.top-row {
+/*.damage-popup.top-row {
   top: 40px;
 }
 
@@ -480,7 +480,7 @@ body {
 
 .damage-popup.bot-row {
   top: 160px;
-}
+}*/
 
 .damage-popup.reporting {
   transition-property: margin-top;
