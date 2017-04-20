@@ -3,7 +3,7 @@ console.log('running mags.js');
 Magnetic = new function() {
 
   var SCREEN_WIDTH = window.innerWidth;
-  var SCREEN_HEIGHT = window.innerHeight;
+  var SCREEN_HEIGHT = 260; //window.innerHeight;
 
   var RIGHT_OFFSET_CONST = 38;
 
@@ -193,8 +193,8 @@ Magnetic = new function() {
   }
 
   function createMagnets() {
-    var w = 393;
-    var h = 262;
+    var w = SCREEN_WIDTH;
+    var h = SCREEN_HEIGHT;
     
     // this will be magnets[0]
     createMagnet({x: w / 2, y: h / 2 + 30});
@@ -203,14 +203,16 @@ Magnetic = new function() {
     for (var i = 0; i < MAGNETS_AT_START; i++) {
 
       var position = {
-        x: 35,
-        y: 40 + 20 * (i % 4)
+        // seems like x should vary by * 4,
+        // the same as in row styles, not sure why * 9 works
+        x: 15 + 28 - Math.floor(i / 2) * 9,
+        y: 20 + 100 + 40 * (i % 4)
         // x: ( SCREEN_WIDTH - w ) * 0.5 + (Math.random() * w), 
         // y: ( SCREEN_HEIGHT - h ) * 0.5 + (Math.random() * h)
       };
 
       if (i > 3) {
-        position.x = w - 35;
+        position.x = w - position.x;
       }
       
       createMagnetAndParticles( position );
@@ -416,7 +418,7 @@ Magnetic = new function() {
 
   function windowResizeHandler() {
     SCREEN_WIDTH = window.innerWidth;
-    SCREEN_HEIGHT = window.innerHeight;
+    SCREEN_HEIGHT = 260; // window.innerHeight;
     
     canvas.width = SCREEN_WIDTH;
     canvas.height = SCREEN_HEIGHT;

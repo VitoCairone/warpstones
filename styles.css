@@ -223,103 +223,73 @@ body {
 }*/
 
 .pers-el {
-  margin-top: 15px;
+  /* should be 15px, sprites are shortened... */
+  position: absolute;
+  margin-top: 7px;
 }
 
 #player-element-1 {
-  position: absolute;
-  top: 40px;
   left: 70px;
 }
 
 #player-element-2 {
-  position: absolute;
-  top: 40px;
   left: 92px;
 }
 
 #player-element-3 {
-  position: absolute;
-  top: 80px;
-  left: 70px;
+  left: 66px;
 }
 
 #player-element-4 {
-  position: absolute;
-  top: 80px;
-  left: 92px;
+  left: 88px;
 }
 
 #player-element-5 {
-  position: absolute;
-  top: 120px;
-  left: 70px;
+  left: 62px;
 }
 
 #player-element-6 {
-  position: absolute;
-  top: 120px;
-  left: 92px;
+  left: 84px;
 }
 
 #player-element-7 {
-  position: absolute;
-  top: 160px;
-  left: 70px;
+  left: 58px;
 }
 
 #player-element-8 {
-  position: absolute;
-  top: 160px;
-  left: 92px;
+  left: 80px;
 }
 
 #player-element-9 {
-  position: absolute;
-  top: 40px;
   right: 92px;
 }
 
 #player-element-10 {
-  position: absolute;
-  top: 40px;
   right: 70px;
 }
 
 #player-element-11 {
-  position: absolute;
-  top: 80px;
-  right: 92px;
+  right: 88px;
 }
 
 #player-element-12 {
-  position: absolute;
-  top: 80px;
-  right: 70px;
+  right: 66px;
 }
 
 #player-element-13 {
-  position: absolute;
-  top: 120px;
-  right: 92px;
+  right: 84px;
 }
 
 #player-element-14 {
-  position: absolute;
-  top: 120px;
-  right: 70px;
+  right: 62px;
 }
 
 #player-element-15 {
-  position: absolute;
-  top: 160px;
-  right: 92px;
+  right: 80px;
 }
 
 #player-element-16 {
-  position: absolute;
-  top: 160px;
-  right: 70px;
+  right: 58px;
 }
 
 #bet-count-overlay {
@@ -373,6 +343,7 @@ body {
 }
 
 .sprite {
+  border: 1px dashed orange;
   position: absolute;
   height: 31px;
   width: 30px;
@@ -392,51 +363,52 @@ body {
 }
 
 .top-row {
-  top: 0px;
+  top: 100px;
 }
 
 .mid-top-row {
-  top: 80px;
+  top: 140px;
 }
 
 .mid-bot-row {
-  top: 120px;
+  top: 180px;
 }
 
 .bot-row {
-  top: 160px;
+  /*top: 90%;*/
+  top: 220px;
 }
 
 #allyTeamBox .sprite.top-row {
-  left: 16px;
-}
-
-#allyTeamBox .sprite.mid-top-row {
-  left: 20px;
-}
-
-#allyTeamBox .sprite.mid-bot-row {
-  left: 24px;
-}
-
-#allyTeamBox .sprite.bot-row {
   left: 28px;
 }
 
+#allyTeamBox .sprite.mid-top-row {
+  left: 24px;
+}
+
+#allyTeamBox .sprite.mid-bot-row {
+  left: 20px;
+}
+
+#allyTeamBox .sprite.bot-row {
+  left: 16px;
+}
+
 #foeTeamBox .sprite.top-row {
-  right: 16px;
+  right: 28px;
 }
 
 #foeTeamBox .sprite.mid-top-row {
-  right: 20px;
-}
-
-#foeTeamBox .sprite.mid-bot-row {
   right: 24px;
 }
 
+#foeTeamBox .sprite.mid-bot-row {
+  right: 20px;
+}
+
 #foeTeamBox .sprite.bot-row {
-  right: 28px;
+  right: 16px;
 }
 
 .sprite.right-sprite {
@@ -628,6 +600,10 @@ by the left edge? */
   width: 0px;
   height: 0px;
 }*/
+
+#combat-area {
+  height: 100%;
+}
 
 .desert-background {
   /*background-image: url('http://68.media.tumblr.com/81c221724f7f5b05f8e8b72ea0cf393f/tumblr_o0aurfiKlq1sm9gg5o1_500.png');*/
