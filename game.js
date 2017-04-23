@@ -51,7 +51,7 @@ var Game = new function () {
     motesPerRound: 7,
     render: false,
     painter: null,
-    clock: clocks.fast,
+    clock: clocks.normal,
     newAllIns: [],
     sidePots: [],
     baseDamageMod: 4.3,
@@ -585,7 +585,7 @@ var Game = new function () {
 
     // ACTUALLY for now decide orders for 1 automatically also
     // dangerous!
-    for (var i = 1; i <= 8; i++) {
+    for (var i = 2; i <= 8; i++) {
       var player = game.players[i];
       if (player.folded || player.allIn) {
         continue;

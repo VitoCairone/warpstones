@@ -77,6 +77,43 @@ function findTopScore() {
   return topScore;
 }
 
+function getVisibleScores(pNum) {
+  var stageResults = [];
+  for (var stage = 0; stage < 3; stage++) {
+    var boardG = null;
+    var combineSs = [null];
+    var combineGs = [null];
+    switch (stage) {
+      case 0: boardG = cards.slice(0, 4); break;
+      case 1: boardG = cards.slice(0, 6); break;
+      case 2: boardG = cards.slice(0, 7); break;
+    }
+    var boardS = gestaltRank(boardG);
+    for (var i = 1; i <= 8; i++) {
+      combineGs.push(boardG.concat([cards[i*2+4], cards[i*2+5]]));
+      combineSs.push(gestaltRank(combineGs[i]));
+    }
+    var result = [boardS, combineSs]
+    stageResults.push(result);
+  }
+  return stageResults;
+}
+
+function getWinners(topScore) {
+  if (typeof topScore === 'undefined') {
+    topScore = findTopScore();
+  }
+  var winners = [];
+  for (var i = 1; i <= 8; i++) {
+    var gestalt = cards.slice(0,5).concat([cards[i*2+4], cards[i*2+5]]);
+    var score = gestaltRank(gestalt);
+    if (score == topScore) {
+      winners.push(i);
+    }
+  }
+  return winners;
+}
+
 function printOutOdds() {
   var scores = Object.keys(scoreOccurHash);
 
@@ -97,7 +134,7 @@ function printOutOdds() {
 }
 
 /*
-100,000,000 run results, w/ builtin rand
+100,000,000 runNoFoldWinner results, w/ builtin rand
 Winning gestalts
 Some quick notes:
   60% are Full House, Trips, or Two Pair
@@ -256,8 +293,9 @@ Rainbow
 7: nearly impossible without folds
 */
 
-(function main() {
-  for (var i = 0; i < 22; i++) {
+function runNoFoldWinner() {
+  var t = 1000;
+  for (var i = 0; i < t; i++) {
     if (i > 0 && i % 10000 == 0) {
       console.log("Ran " + i);
     }
@@ -272,4 +310,159 @@ Rainbow
   }
 
   printOutOdds();
+};
+
+function runNoFoldPrediction() {
+  var t = 15000000;
+
+  var partialsOccur = {};
+  var partialsWins = {};
+  for (var i = 0; i < t; i++) {
+    if (i > 0 && i % 10000 == 0) {
+      console.log("Ran " + i);
+    }
+    shuffle();
+    // only stage 0 right now
+    var visibleScores = getVisibleScores()[0];
+    var boardS = visibleScores[0];
+    var playerSs = visibleScores[1];
+    var winners = getWinners();
+    var wonArr = [null, false, false, false, false, false, false, false, false];
+    for (var j = 0; j < winners.length; j++) {
+      wonArr[winners[j]] = true;
+    }
+    for (var j = 1; j <= 8; j++) {
+      var keyStr = playerSs[j] + "_" + boardS;
+      if (keyStr in partialsOccur) {
+        partialsOccur[keyStr] += 1;
+      } else {
+        partialsOccur[keyStr] = 1;
+      }
+      if (wonArr[j]) {
+        if (keyStr in partialsWins) {
+          partialsWins[keyStr] += 8 / winners.length;
+        } else {
+          partialsWins[keyStr] = 8 / winners.length;
+        }
+      } else {
+        if (!(keyStr in partialsWins)) {
+          partialsWins[keyStr] = 0;
+        }
+      }
+    }
+  }
+
+  // done running, print out odds
+
+  var keys = Object.keys(partialsWins);
+
+  keys.sort(function (a, b) {
+    return partialsWins[b]/partialsOccur[b] - partialsWins[a]/partialsOccur[a];
+  });
+
+  for (var i = 0; i < keys.length; i++) {
+    var winning = partialsWins[keys[i]] / partialsOccur[keys[i]];
+    console.log(keys[i] + ': ' + Math.round(winning * 100) / 100);
+  }
+
+  return;
+}
+
+/*
+
+runNoFoldPrediction 1,000,000 trial results
+w/ builtin Rand
+
+no-voids 
+100000_1000: 8
+10002_102: 8
+10001_101: 7.73
+1003_13: 7.64
+1010_20: 7.48
+1002_12: 7.45
+10002_1000: 7.17
+1010_101: 6.94
+200_20: 6.9
+104_5: 6.27
+112_13: 5.82
+10001_1000: 5.79
+1003_101: 5.73
+103_4: 5.6
+111_12: 5.13
+1003_102: 4.88
+1002_101: 4.37
+112_20: 3.64
+104_12: 3.3
+23_5: 3.21
+104_13: 3.03
+103_12: 2.28
+22_4: 2.16
+200_101: 1.99
+111_20: 1.86
+30_12: 1.57
+112_101: 1.27
+-- fold-pt!
+1010_1000: 0.97
+15_5: 0.75
+23_12: 0.69
+112_102: 0.68
+23_13: 0.58
+30_20: 0.54
+15_4: 0.53
+14_4: 0.47
+111_101: 0.44
+1003_1000: 0.37
+22_12: 0.31
+1002_1000: 0.22
+104_102: 0.15
+104_101: 0.14
+103_101: 0.07
+7_5: 0.06
+15_13: 0.06
+15_12: 0.04
+7_4: 0.04
+14_12: 0.03
+6_4: 0.03
+23_20: 0.03
+22_20: 0.03
+
+voids
+1000000111_12: 8
+1000001010_1000: 8
+1000000112_102: 8
+1000001010_1000000020: 8
+1000000112_13: 8
+1000000112_101: 8
+1000001010_101: 8
+1000000030_20: 8
+1000000023_13: 8
+1000000023_5: 8
+1000000023_12: 8
+1000000015_5: 8
+1000000015_4: 8
+1000000030_12: 8
+1000000022_4: 8
+1000000111_101: 8
+1000000022_12: 8
+1000000014_4: 8
+1000000112_1000000013: 7.64
+1000000111_1000000012: 7.15
+1000000112_1000000020: 7.06
+1000000030_1000000012: 5.01
+1000000111_1000000020: 3.89
+1000000023_1000000012: 2.32
+1000000023_1000000013: 2.11
+1000000022_1000000012: 1.21
+1000000030_1000000020: 1.16
+-- fold-pt!
+1000000015_1000000013: 0.34
+1000000015_1000000012: 0.33
+1000000023_1000000020: 0.29
+1000000014_1000000012: 0.11
+1000000022_1000000020: 0.1
+
+*/
+
+(function main() {
+  runNoFoldPrediction();
 })();
