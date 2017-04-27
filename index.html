@@ -7,8 +7,10 @@
 <link rel="stylesheet" type="text/css" href="styles.css" />
 
 <TITLE>
-  Warpstones
+  Warpstones !!
 </TITLE>
+
+<script src="pixi.js"></script>
 
 </HEAD>
 <BODY style="margin: 0 0 0 0;">
@@ -186,14 +188,62 @@
 
   </div> <!-- /control-area -->
 
-  <!-- Magnetic should never need to call anything from Game -->
-  <script src="mags.js" type="text/javascript"></script>
+  <!-- Piximags should never need to call anything from Game -->
+  <script src="piximags.js" type="text/javascript"></script>
+
+  <!-- <script src="mags.js" type="text/javascript"></script> -->
 
   <script src="game.js" type="text/javascript"></script>
 
   <script src="painter.js" type="text/javascript"></script>
 
   <SCRIPT>
+
+    var type = "WebGL"
+    if(!PIXI.utils.isWebGLSupported()){
+      alert("no WebGL support, fallback to canvas");
+      type = "canvas"
+    } else {
+      console.log("Using WebGL!");
+    }
+
+    PIXI.utils.sayHello(type)
+
+    //Create the renderer
+
+    // kitkatattack sez: "Importantly: although the stage also has width and 
+    // height properties, they don't refer to the size of the rendering 
+    // window. The stage's width and height just tell you the area occupied 
+    // by the things you put inside it
+
+    var widthPixels = 200;
+    var heightPixels = 200;
+    var renderer = PIXI.autoDetectRenderer(
+      widthPixels,
+      heightPixels,
+      {
+        antialias: false,
+        transparent: true,
+        resoultion: 1
+      });
+
+    renderer.view.style.position = "absolute";
+    renderer.view.style.top = "0px";
+    renderer.view.style.left = "0px";
+    // renderer.view.style.display = "block";
+    renderer.autoResize = true;
+    // console.log("iW = " + window.innerWidth);
+    // console.log("iH = " + window.innerHeight);
+    // unknown why window.innerHeight is 604 when actual height is not??
+    renderer.resize(window.innerWidth, 260);
+
+    //Add the canvas to the HTML document
+    document.body.appendChild(renderer.view);
+
+    //Create a container object called the `stage`
+    var stage = new PIXI.Container();
+
+    Magnetic.init(renderer, stage);
 
     // this method of watching for 'transitioned' events to fire seems kind of ugly...
     // possibly prefer just to sync timing of effect-end functions
