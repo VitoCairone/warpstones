@@ -324,7 +324,7 @@ body {
 }
 
 .sprite {
-  border: 1px dashed orange;
+  /*border: 1px dashed orange;*/
   position: absolute;
   height: 31px;
   width: 30px;
@@ -336,6 +336,7 @@ body {
   /*border: 1px solid orange;*/
   margin: 0px;
   animation: playsprite 0.4s steps(4) infinite;
+  z-index: 100;
 }
 
 @keyframes playsprite {
