@@ -22,19 +22,22 @@ var Game = new function () {
       betStage: 3500,
       matchStage: 1500,
       spellLocking: 2000,
-      spellCasting: 2000
+      spellCasting: 2000,
+      autoRestartDelay: 5000
     },
     fast: {
       betStage: 350,
       matchStage: 150,
       spellLocking: 200,
-      spellCasting: 750
+      spellCasting: 750, // note: projectile CSS animation runs in 700 ms
+      autoRestartDelay: 5000
     },
     runhot: {
       betStage: 0,
       matchStage: 0,
       spellLocking: 0,
-      spellCasting: 0
+      spellCasting: 0,
+      autoRestartDelay: 1500
     }
   }
 
@@ -51,12 +54,13 @@ var Game = new function () {
     motesPerRound: 7,
     render: false,
     painter: null,
-    clock: clocks.fast,
+    clock: clocks.runhot,
     newAllIns: [],
     sidePots: [],
     baseDamageMod: 4.3,
     inputPhase: null,
-    teamOneWinRecord: [0, 0]
+    teamOneWinRecord: [0, 0],
+    disableP1bot: false
   }
 
   this.begin = function () {
@@ -85,7 +89,6 @@ var Game = new function () {
   }
 
   this.setPainter = function (painter) {
-    game.render = true;
     game.painter = painter;
   }
 
@@ -107,7 +110,6 @@ var Game = new function () {
       game.baseDamageMod = Math.round(game.baseDamageMod * 100 * (1 - autoAdjustSize)) / 100;
     }
     autoAdjustSize *= 0.999;
-    console.log("######################################");
     console.log("######################################");
     console.log("######################################");
     console.log("######################################");
@@ -146,7 +148,6 @@ var Game = new function () {
   }
 
   function advanceStage() {
-    // console.log('started advanceStage');
     game.stage = (game.stage + 1) % 5
     if (game.stage == 0) {
       game.rounds += 1;
@@ -158,17 +159,10 @@ var Game = new function () {
     var player = game.players[pNum];
 
     if (player.betCount >= 7 || player.folded || player.allIn || player.motes.length == 0) {
-      // var hax = 8 * (player.betCount >= 7) +
-      //   4 * (player.folded) + 
-      //   2 * (player.allIn) + 
-      //   (player.motes.length == 0);
-      // alert("can't bet because: " + hax);
       return 0;
     }
 
     var betSize = Math.floor(game.roundStartMana[pNum] / 7);
-
-    // console.log("betSize = " + betSize);
 
     if (betSize == 0) {
       betSize = 1;
@@ -176,14 +170,10 @@ var Game = new function () {
       betSize = game.forceEndBetSize;
     }
 
-    // console.log("betSize = " + betSize);
-
     // seventh bet should generally be all-in
     if ((player.betCount + 1 >= 7) && (player.motes.length <= game.forceEndBetSize)) {
       betSize = player.motes.length;
     }
-
-    // console.log("betSize = " + betSize);
 
     if (betSize > player.motes.length) {
       // this DOES trigger, make sure to check this out later
@@ -195,13 +185,11 @@ var Game = new function () {
     player.wager += betSize;
 
     sendMotesToWarp(pNum, betSize);
-    // var mote = player.motes.pop();
-    // game.warpMotes.push(mote);
 
-    console.log(player.name + " bets " + betSize + " with " +  player.motes.length + " remaining.")
+    // console.log(player.name + " bets " + betSize + " with " +  player.motes.length + " remaining.")
 
     if (player.motes.length == 0) {
-      console.log("set " + pNum + " " + player.name + " all-in @bet.");
+      // console.log("set " + pNum + " " + player.name + " all-in @bet.");
       setAllIn(pNum);
       player.betCount = 7;
       checkForCapture();
@@ -241,7 +229,7 @@ var Game = new function () {
 
   function createSidePot(requirement, outstanding) {
 
-    console.log("running createSidePot for " + requirement + ", " + outstanding);
+    // console.log("running createSidePot for " + requirement + ", " + outstanding);
 
     if (requirement == 0) {
       alert("Error: requirement 0 in createSidePot");
@@ -252,7 +240,7 @@ var Game = new function () {
       // went all-in with exactly the same amount of mana.
       // The first side-pot handles their wager completely,
       // so don't create another
-      console.log("returning due to outstanding = 0");
+      // console.log("returning due to outstanding = 0");
       return;
     }
     var eligible = [];
@@ -277,7 +265,7 @@ var Game = new function () {
       amount += eligible.length * outstanding;
     }
 
-    console.log("Transferring " + amount + " from warp to side pot");
+    // console.log("Transferring " + amount + " from warp to side pot");
 
     var transfer = game.warpMotes.slice(0, amount);
     game.warpMotes = game.warpMotes.slice(amount, Infinity);
@@ -351,12 +339,10 @@ var Game = new function () {
     }
 
     if (game.newAllIns.length > 0) {
-      console.log("newAllIns: " + game.newAllIns);
 
-      console.log("PRESORT");
-      for (var i = 0; i < game.newAllIns.length; i++) {
-        console.log(game.newAllIns[i] + " round start mana " + game.roundStartMana[game.newAllIns[i]]); 
-      }
+      // for (var i = 0; i < game.newAllIns.length; i++) {
+      //   console.log(game.newAllIns[i] + " round start mana " + game.roundStartMana[game.newAllIns[i]]); 
+      // }
 
       // turn newAllIns from this stage into sidePots
       // first, sort newAllIns by roundStartMana, DESCENDING
@@ -368,10 +354,9 @@ var Game = new function () {
       var pNum = null;
       var amount = null;
 
-      console.log("POSTSORT");
-      for (var i = 0; i < game.newAllIns.length; i++) {
-        console.log(game.newAllIns[i] + " round start mana " + game.roundStartMana[game.newAllIns[i]]); 
-      }
+      // for (var i = 0; i < game.newAllIns.length; i++) {
+      //   console.log(game.newAllIns[i] + " round start mana " + game.roundStartMana[game.newAllIns[i]]); 
+      // }
 
       while (game.newAllIns.length > 0) {
         pNum = game.newAllIns.pop();
@@ -382,7 +367,7 @@ var Game = new function () {
       }
     }
 
-    console.log("Warp now has " + game.warpMotes.length);
+    // console.log("Warp now has " + game.warpMotes.length);
 
     if (game.render) {
       game.painter.animateEndMatchStage();
@@ -391,7 +376,7 @@ var Game = new function () {
     checkForCapture();
 
     if (game.captureTo != null) {
-      console.log("Captured by " + game.players[game.captureTo].name);
+      // console.log("Captured by " + game.players[game.captureTo].name);
       game.stage = 2; // cause advanceStage to go right to showdown
     }
 
@@ -421,7 +406,7 @@ var Game = new function () {
     if (game.render) {
       game.painter.animateFold(pNum);
     }
-    console.log(player.name + ' folds.')
+    // console.log(player.name + ' folds.')
 
     checkForCapture();
 
@@ -429,13 +414,8 @@ var Game = new function () {
   }
 
   function gameLoop() {
-    // game.timeoutRefs = [];
-    console.log ('started gameLoop')
+    // console.log ('started gameLoop')
     advanceStage();
-
-    // if (game.render) {
-    //   window.setInterval(game.painter.animateSprites, 1000 / 3);
-    // }
   }
 
   function getPlayerCards(pNum) {
@@ -464,18 +444,13 @@ var Game = new function () {
     sendMotesToWarp(pNum, amount);
     var betCount = (player.motes.length == 0 ? 7 : 0)
     if (game.render) {
-      
       game.painter.animateBet(pNum, betCount, amount);
-      // window.setTimeout(function () { 
-      //   game.painter.animateBet(pNum, betCount, amount);
-      // }, Math.round(Math.random() * 250));
-      
     }
 
-    console.log(player.name + " calls@meet with " + player.motes.length + " remaining.");
+    // console.log(player.name + " calls " + amount + " @meet with " + player.motes.length + " remaining.");
 
     if (player.motes.length == 0) {
-      console.log("set " + pNum + " " + game.players[pNum].name  + " all-in @meet.")
+      // console.log("set " + pNum + " " + game.players[pNum].name  + " all-in @meet.")
       setAllIn(pNum);
       checkForCapture();
     }
@@ -530,7 +505,7 @@ var Game = new function () {
 
   function startBetStage() { 
 
-    console.log("~ BET STAGE " + game.stage + " START ~");
+    // console.log("~ BET STAGE " + game.stage + " START ~");
 
     game.inputPhase = 'bet';
 
@@ -553,11 +528,11 @@ var Game = new function () {
       return bet.bind(null, x);
     }
 
-    // skip player 1; let interface control
+    for (var i = 1; i <= 8; i++) {
+      if (game.disableP1bot && i == 1) {
+        continue;
+      }
 
-    // ACTUALLY for now decide orders for 1 automatically also
-    // dangerous!
-    for (var i = 2; i <= 8; i++) {
       var player = game.players[i];
       if (player.folded || player.allIn) {
         continue;
@@ -609,7 +584,7 @@ var Game = new function () {
     if (game.render) {
       game.painter.updateHealthReadout(game.players);
     }
-    console.log('~~~ ROUND ' + game.rounds + ' START! ~~~');
+    // console.log('~~~ ROUND ' + game.rounds + ' START! ~~~');
     game.captureTo = null;
     game.sidePots = [];
     game.roundStartMana = [null, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -634,7 +609,8 @@ var Game = new function () {
       //   gain = Math.ceil(gain * 4 / 7);
       // }
       if (player.motes.length >= 250) {
-        console.log("!! " + player.name + " has " + player.motes.length + " mana.")
+        ;
+        // console.log("!! " + player.name + " has " + player.motes.length + " mana.")
         // gain = 0;
       }
       for (var j = 0; j < gain; j++) {
@@ -658,14 +634,14 @@ var Game = new function () {
     game.forceEndWager = secondStack;
     game.forceEndBetSize = Math.ceil(game.forceEndWager / 7);
 
-    console.log("forceEndWager = " + game.forceEndWager);
-    console.log("forceEndBetSize = " + game.forceEndBetSize);
+    // console.log("forceEndWager = " + game.forceEndWager);
+    // console.log("forceEndBetSize = " + game.forceEndBetSize);
 
     if (game.forceEndBetSize == 0) {
       alert('Error: forceEnd = 0');
     }
 
-    console.log("roundStartMana: " + game.roundStartMana);
+    // console.log("roundStartMana: " + game.roundStartMana);
   }
 
   function startStage() {
@@ -675,7 +651,9 @@ var Game = new function () {
       case 0:
         // flop
         startRound();
-        game.painter.hideAllCards();
+        if (game.render) {
+          game.painter.hideAllCards();
+        }
         shuffleCards();
         if (game.render) {
           game.painter.zeroBetOverlay();
@@ -734,8 +712,10 @@ var Game = new function () {
 
   function triggerByClock(callback, time) {
     if (time >= 0) {
+      // a setTimeout of 0 still waits for 1 stack execution frame
       window.setTimeout(callback, time);
     } else {
+      // this callback runs immedately, in the same execution frame
       callback();
     }
   }
@@ -769,9 +749,7 @@ var Game = new function () {
         game.painter.animateEnd(teamOneAlive, teamTwoAlive);
       }
 
-      window.setTimeout(function () {
-        startNewGame();
-      }, 5000);
+      triggerByClock(startNewGame, game.clock.autoRestartDelay);
 
       return true;
     }
@@ -802,14 +780,14 @@ var Game = new function () {
   function spellLocking() {
     var winners = game.winners;
 
-    console.log("Total mana before casting = " + totalMana());
+    // console.log("Total mana before casting = " + totalMana());
 
     // when rendering, the strike is DELAYED by the time for
     // the animation to complete, so behavior here is async!!
 
     botSpellCasting();
 
-    console.log("Total mana after casting = " + totalMana());
+    // console.log("Total mana after casting = " + totalMana());
 
     triggerByClock(endSpellCastingStage, game.clock.spellCasting);
   }
@@ -836,7 +814,7 @@ var Game = new function () {
       for (var j = 0; j < gestalt.length; j++) {
         shortHand.push(gestalt[j].charAt(0).toUpperCase())
       }
-      console.log(player.name + ' has ' + shortHand.join('') + ' worth ' + score);
+      // console.log(player.name + ' has ' + shortHand.join('') + ' worth ' + score);
       // game.players[i].score = score;
     }
   }
@@ -912,7 +890,7 @@ var Game = new function () {
   function checkForFaint(pNum) {
     var player = game.players[pNum];
     if (player.hp <= 0 && !player.ghost) {
-      console.log(player.name + ' has fainted!');
+      // console.log(player.name + ' has fainted!');
       player.hp = 0;
       player.ghost = true;
       if (game.render) {
@@ -987,14 +965,12 @@ var Game = new function () {
     // if there are side pots and/or multiple winners, motes must be
     // distributed whole and undivided, in an unbiased way.
 
-    console.log("sidePotLens = " + game.sidePots.length);
-
     while (game.sidePots.length > 0) {
 
       var sidePot = game.sidePots.pop();
 
-      console.log("sidePot = ");
-      console.log(sidePot);
+      // console.log("sidePot = ");
+      // console.log(sidePot);
 
       var winners = findWinners(sidePot);
 
@@ -1087,9 +1063,9 @@ var Game = new function () {
       game.painter.animateDamage(targNum, dam);
     }
 
-    console.log(player.name + ' spent ' + moteSpend + ' mana to cast force blast on ' + target.name + ' for ' + dam + ' damage.');
+    // console.log(player.name + ' spent ' + moteSpend + ' mana to cast force blast on ' + target.name + ' for ' + dam + ' damage.');
 
-    console.log(target.name + ' has ' + target.hp + ' health remaining.');
+    // console.log(target.name + ' has ' + target.hp + ' health remaining.');
 
     checkForFaint(targNum);
   }
@@ -1107,8 +1083,8 @@ var Game = new function () {
 
     if (player.ghost && player.motes.length >= reviveCost) {
       spellName = 'Revive';
-      console.log(player.name + ' cast Revive.');
-      console.log(player.name + ' has revived with 500 hp.');
+      // console.log(player.name + ' cast Revive.');
+      // console.log(player.name + ' has revived with 500 hp.');
       moteSpend = reviveCost;
       player.hp = 500;
       player.ghost = false;
@@ -1118,12 +1094,12 @@ var Game = new function () {
     } else if (player.ghost) {
       spellName = 'Boo!';
       manaSpend = 0;
-      console.log(player.name + ' cast Boo!')
+      // console.log(player.name + ' cast Boo!')
     } else {
       spellName = 'Force Blast';
 
       if (pNum <= 4) {
-        // leeft team casts at 1/3
+        // left team casts at 1/3
         moteSpend = Math.ceil(player.motes.length / 3);
       } else {
         // right team casts at 2/3

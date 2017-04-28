@@ -106,7 +106,7 @@ var Painter = new function () {
   }
 
   this.destructParticles = function (pNum, loss) {
-    Magnetic.destructParticles(pNum, moteSpend);
+    Magnetic.destructParticles(pNum, loss);
   }
 
   this.hideAllCards = function () {
