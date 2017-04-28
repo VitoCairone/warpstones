@@ -1,5 +1,7 @@
 var Painter = new function () {
 
+  this.manaDraw = Magnetic;
+
   this.animateAllIn = function (pNum) {
     return;
   }
@@ -25,11 +27,20 @@ var Painter = new function () {
   //   };
   // }
 
+  this.animateSendWinnings = function (winnings) {
+    Magnetic.distributeParticles(winnings);
+  }
+
   this.animateResetTimerBar = function () {
     // console.log('resetting timer bar');
     // document.getElementById('progress-bar-fill').style.width = "0%";
     document.getElementById('progress-bar-fill').classList.remove('bet-stage', 'match-stage');
     // document.getElementById('progress-bar-fill').classList.add('reset');
+  }
+
+  this.animateGrantNewParticles = function (pNum, gain) {
+    Magnetic.conjureParticles(pNum, gain);
+    Magnetic.expandParticles(pNum);
   }
 
   this.animateBetTimerBar = function () {
@@ -94,6 +105,10 @@ var Painter = new function () {
     el.classList.add('target' + targNum);
   }
 
+  this.destructParticles = function (pNum, loss) {
+    Magnetic.destructParticles(pNum, moteSpend);
+  }
+
   this.hideAllCards = function () {
     var orbClasses = [
       'light-orb',
@@ -121,6 +136,10 @@ var Painter = new function () {
     }
   }
 
+  this.setMessage = function (msg) {
+    document.getElementById("message-box").innerHTML = msg;
+  }
+
   this.showFlopCards = function (cards) { revealElements([1, 2], cards); }
 
   this.showTurnCards = function (cards) { revealElements([3, 4], cards); }
@@ -137,6 +156,10 @@ var Painter = new function () {
     el.classList.remove('fainted');
   }
 
+  this.resetMaxMarked = function () {
+    Magnetic.resetMaxMarked();
+  }
+
   this.showPersonalCardsFor = function (nums, cards) {
     for (var i = 0; i < nums.length; i++) {
       var n = nums[i];
@@ -148,6 +171,10 @@ var Painter = new function () {
       document.getElementById("player-element-" + id2).classList.add(cards[slot2] + '-orb');
     }
   }
+
+  this.unhiliteAllParticles = function () {
+    Magnetic.unhiliteAllParticles();
+  };
 
   this.updateHealthReadout = function (players) {
     var readout = "";

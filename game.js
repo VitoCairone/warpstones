@@ -510,10 +510,6 @@ var Game = new function () {
     game.warpMotes = game.warpMotes.concat(transfer);
   }
 
-  function setMessage(msg) {
-    document.getElementById("message-box").innerHTML = msg;
-  }
-
   function shuffle (array) {
     //Fisher-Yates shuffle
     var i = 0
@@ -540,7 +536,7 @@ var Game = new function () {
 
     if (game.render) {
       game.painter.animateBetTimerBar();
-      Magnetic.resetMaxMarked();
+      game.painter.resetMaxMarked();
     }
 
     game.maxWager = 0;
@@ -621,7 +617,7 @@ var Game = new function () {
     game.inputPhase = null;
 
     if (game.render) {
-      Magnetic.unhiliteAllParticles();
+      game.painter.unhiliteAllParticles();
     }
 
     var topStack = 0;
@@ -655,8 +651,7 @@ var Game = new function () {
       game.roundStartMana[i] = player.motes.length;
 
       if (game.render) {
-        Magnetic.conjureParticles(i, gain);
-        Magnetic.expandParticles(i);
+        game.painter.animateGrantNewParticles(i, gain);
       }
     }
 
@@ -1029,8 +1024,7 @@ var Game = new function () {
     var completeShowdown = function () {
       var winnings = sendManaToWinners();
       if (game.render) {
-        // MUST CHANGE IN MAGNETIC !!
-        Magnetic.distributeParticles(winnings);
+        game.painter.animateSendWinnings(winnings);
       }
 
       game.winners = [];
@@ -1141,7 +1135,7 @@ var Game = new function () {
       player.motes = player.motes.slice(moteSpend, player.motes.length);
 
       if (game.render) {
-        Magnetic.destructParticles(pNum, moteSpend);
+        game.painter.destructParticles(pNum, moteSpend);
       }
 
       // Then, transit spell, applying strike after
