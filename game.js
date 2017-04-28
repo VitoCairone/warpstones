@@ -51,7 +51,7 @@ var Game = new function () {
     motesPerRound: 7,
     render: false,
     painter: null,
-    clock: clocks.normal,
+    clock: clocks.fast,
     newAllIns: [],
     sidePots: [],
     baseDamageMod: 4.3,
@@ -610,7 +610,9 @@ var Game = new function () {
   }
 
   function startRound() {
-    updateHealthReadout();
+    if (game.render) {
+      game.painter.updateHealthReadout(game.players);
+    }
     console.log('~~~ ROUND ' + game.rounds + ' START! ~~~');
     game.captureTo = null;
     game.sidePots = [];
@@ -741,22 +743,6 @@ var Game = new function () {
     } else {
       callback();
     }
-  }
-
-  function updateHealthReadout() {
-    var readout = "";
-
-    for (var i = 1; i <= 4; i++) {
-      var left = i;
-      var right = 4 + i;
-      var player = game.players[left];
-      readout += player.name + ': ' + player.hp + '       ';
-      player = game.players[right];
-      readout += player.name + ': ' + player.hp;
-      readout += '<br/>';
-    }
-
-    document.getElementById('healthReadout').innerHTML = readout;
   }
 
   function detectWinCondition() {

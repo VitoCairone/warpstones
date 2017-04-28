@@ -94,7 +94,7 @@ var Painter = new function () {
     el.classList.add('target' + targNum);
   }
 
-  this.hideAllCards = function () {}
+  this.hideAllCards = function () {
     var orbClasses = [
       'light-orb',
       'dark-orb',
@@ -120,7 +120,7 @@ var Painter = new function () {
       }
     }
   }
-  
+
   this.showFlopCards = function (cards) { revealElements([1, 2], cards); }
 
   this.showTurnCards = function (cards) { revealElements([3, 4], cards); }
@@ -147,6 +147,22 @@ var Painter = new function () {
       document.getElementById("player-element-" + id1).classList.add(cards[slot1] + '-orb');
       document.getElementById("player-element-" + id2).classList.add(cards[slot2] + '-orb');
     }
+  }
+
+  this.updateHealthReadout = function (players) {
+    var readout = "";
+
+    for (var i = 1; i <= 4; i++) {
+      var left = i;
+      var right = 4 + i;
+      var player = players[left];
+      readout += player.name + ': ' + player.hp + '       ';
+      player = players[right];
+      readout += player.name + ': ' + player.hp;
+      readout += '<br/>';
+    }
+
+    document.getElementById('healthReadout').innerHTML = readout;
   }
 
   this.zeroBetOverlay = function () {
