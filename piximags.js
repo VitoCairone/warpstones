@@ -269,16 +269,20 @@ Magnetic = new function() {
 
       // don't do this! use generateTextures()
 
-      graphic.beginFill(0x000040);
-      graphic.drawCircle(0, 0, 7);   //(x,y,radius)
+      graphic.beginFill(0xFFFFFF, 0.017);
+      graphic.drawCircle(0, 0, 30);   //(x,y,radius)
       graphic.endFill();
 
-      graphic.beginFill(0x0000A0);
-      graphic.drawCircle(0, 0, 4);   //(x,y,radius)
+      graphic.beginFill(0x9999FF, 0.025);
+      graphic.drawCircle(0, 0, 20);   //(x,y,radius)
       graphic.endFill();
 
-      graphic.beginFill(0xFFFFFF);
-      graphic.drawCircle(0, 0, 2);   //(x,y,radius)
+      graphic.beginFill(0x9977FF, 0.8);
+      graphic.drawCircle(0, 0, 6);   //(x,y,radius)
+      graphic.endFill();
+
+      graphic.beginFill(0xFFFFFF, 1);
+      graphic.drawCircle(0, 0, 3);   //(x,y,radius)
       graphic.endFill();
 
       // var size = 3;
@@ -383,6 +387,10 @@ Magnetic = new function() {
           particle.orbitPush = 0.95 * particle.orbitPush + 0.05 * orbitPushTarget;
         }
         var orbitPush = particle.orbitPush;
+
+        // orbitVariance is applied after pull to the magnet's orbit,
+        // so it then applies to that matched orbit
+        orbitPush *= particle.orbitVariance;
 
         
         // Rotation
@@ -551,7 +559,7 @@ function Particle() {
   this.position = { x: 0, y: 0 };
   this.shift = { x: 0, y: 0 };
   this.angle = 0;
-  this.speed = 0.02 + 0.1 * Math.random() + this.size * 0.004;
+  this.speed = 0.015 + 0.05 * (Math.random() + Math.random()); // + this.size * 0.004;
   this.force = 2.1 + Math.random() * 0.2; // 1.5 + Math.random() * 1.5;
   this.color = '#ddddff';
   this.innerColorStop = 'rgba(256,256,256,1.0)';
@@ -561,6 +569,7 @@ function Particle() {
   this.betGlowFrames = 0;
   this.timeToArrival = 0;
   this.orbitPush = 1;
+  this.orbitVariance = ((2 * 0.85) + Math.random() * 0.3 + Math.random() * 0.3) / 2;
 }
 
 function Magnet() {
