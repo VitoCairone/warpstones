@@ -94,6 +94,33 @@ var Painter = new function () {
     el.classList.add('target' + targNum);
   }
 
+  this.hideAllCards = function () {}
+    var orbClasses = [
+      'light-orb',
+      'dark-orb',
+      'earth-orb',
+      'fire-orb',
+      'water-orb',
+      'air-orb',
+      'ice-orb',
+      'void-orb',
+      'gold-orb'
+    ]
+
+    // clearing any -orb class from every card-el element,
+    // which includes board and personal cards.
+    // Sidenote: this lazy method runs up to (5+16) * 9 tests
+    // but it could be possible insead to just clear -orb
+    // from .class using regexp ?? anyway, probably not a bottleneck
+    var cardEls = document.getElementsByClassName("card-el");
+    for (var i = 0; i < cardEls.length; i++) {
+      var cardEl = cardEls[i];
+      for (var j = 0; j < orbClasses.length; j++) {
+        cardEl.classList.remove(orbClasses[j]);
+      }
+    }
+  }
+  
   this.showFlopCards = function (cards) { revealElements([1, 2], cards); }
 
   this.showTurnCards = function (cards) { revealElements([3, 4], cards); }

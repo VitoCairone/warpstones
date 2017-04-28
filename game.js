@@ -447,30 +447,6 @@ var Game = new function () {
     return game.cards.slice(16, 21);
   }
 
-  function hideAllCards() {
-    // var cardEls = ['pers-element-1', 'pers-element-2', 'rev-element-1', 'rev-element-2', 'rev-element-3', 'rev-element-4', 'rev-element-5'];
-
-    var orbClasses = [
-      'light-orb',
-      'dark-orb',
-      'earth-orb',
-      'fire-orb',
-      'water-orb',
-      'air-orb',
-      'ice-orb',
-      'void-orb',
-      'gold-orb'
-    ]
-
-    var cardEls = document.getElementsByClassName("card-el");
-    for (var i = 0; i < cardEls.length; i++) {
-      var cardEl = cardEls[i];
-      for (var j = 0; j < orbClasses.length; j++) {
-        cardEl.classList.remove(orbClasses[j]);
-      }
-    }
-  }
-
   function meet(pNum) {
     var player = game.players[pNum];
     var diff = game.maxWager - player.wager;
@@ -702,7 +678,7 @@ var Game = new function () {
       case 0:
         // flop
         startRound();
-        hideAllCards();
+        game.painter.hideAllCards();
         shuffleCards();
         if (game.render) {
           game.painter.zeroBetOverlay();
