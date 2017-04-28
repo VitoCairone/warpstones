@@ -175,6 +175,7 @@ Magnetic = new function() {
         particles.push(originalParticles[i]);
       } else {
         graphics[id].visible = false;
+        graphics[id] = graphics[id].normalVersion;
         freeParticleIds.push(id)
       }
     }
