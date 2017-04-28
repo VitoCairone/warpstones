@@ -63,7 +63,11 @@ Magnetic = new function() {
     }
     magnet.markedParticles += 1;
     magnet.particles[particleIdx].betGlowFrames = 30;
-    magnet.particles[particleIdx].innerColorStop = 'rgba(256,0,0,1.0)';
+    var id = magnet.particles[particleIdx].id;
+    graphics[id].visible = false;
+    graphics[id] = graphics[id].glowyVersion;
+    graphics[id].visible = true;
+
     if (magnet.markedParticles > maxMarkedParticles) {
       maxMarkedParticles = magnet.markedParticles;
     }
@@ -81,7 +85,10 @@ Magnetic = new function() {
       magnets[i].markedParticles = 0;
     }
     for (var i = 0; i < particles.length; i++) {
-      particles[i].innerColorStop = 'rgba(256,256,256,1.0)';
+      var id = particles[i].id;
+      graphics[id].visible = false;
+      graphics[id] = graphics[id].normalVersion;
+      graphics[id].visible = true;
     }
     maxMarkedParticles = 0;
   }
@@ -308,8 +315,6 @@ Magnetic = new function() {
 
       redG.visible = false;
 
-      graphic.redVersion = redG;
-
       var glowy = new PIXI.Graphics();
 
       glowy.beginFill(0xFFFFFF, 0.03);
@@ -334,17 +339,30 @@ Magnetic = new function() {
 
       glowy.visible = false;
 
+      graphic.normalVersion = graphic;
+      graphic.redVersion = redG;
       graphic.glowyVersion = glowy;
 
-      if (Math.random() < 0.7) {
-        graphics.push(graphic);
-      } else if (Math.random() < 0.7) {
-        graphics.push(graphic.redVersion);
-      } else {
-        graphics.push(graphic.glowyVersion);
-      }
+      redG.normalVersion = graphic;
+      redG.redVersion = redG;
+      redG.glowyVersion = glowy;
 
-      this.stage.addChild(graphics[graphics.length - 1]);
+      glowy.normalVersion = graphic;
+      glowy.redVersion = redG;
+      glowy.glowyVersion = glowy;
+
+      // if (Math.random() < 0.7) {
+      // } else if (Math.random() < 0.7) {
+        // graphics.push(graphic.redVersion);
+      // } else {
+        // graphics.push(graphic.glowyVersion);
+      // }
+
+      this.stage.addChild(graphic);
+      this.stage.addChild(redG);
+      this.stage.addChild(glowy);
+
+      graphics.push(graphic);
     }
   }
 
