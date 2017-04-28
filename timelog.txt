@@ -21,4 +21,3 @@ Thu 4-27 (Day 10) 10:51p-11:54p (1h03m)
   create better mana graphics with Pixi API
 
 Fri 4-28 (Day 11) 11:33a-
-  

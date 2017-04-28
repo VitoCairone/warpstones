@@ -16,6 +16,7 @@ var Game = new function () {
 
   var gameCounter = 0;
   var autoAdjustSize = 0.1;
+  var skipStackCounter = 0;
 
   var clocks = {
     normal: {
@@ -37,7 +38,7 @@ var Game = new function () {
       matchStage: 0,
       spellLocking: 0,
       spellCasting: 0,
-      autoRestartDelay: 1500
+      autoRestartDelay: 0
     }
   }
 
@@ -52,12 +53,12 @@ var Game = new function () {
     warpMotes: [],
     startMotes: 21,
     motesPerRound: 7,
-    render: false,
+    render: true,
     painter: null,
-    clock: clocks.runhot,
+    clock: clocks.normal,
     newAllIns: [],
     sidePots: [],
-    baseDamageMod: 4.3,
+    baseDamageMod: 5.5,
     inputPhase: null,
     teamOneWinRecord: [0, 0],
     disableP1bot: false
@@ -66,6 +67,9 @@ var Game = new function () {
   this.begin = function () {
     game.startTime = new Date().getTime();
 
+    if (game.render) {
+      Magnetic.begin();
+    }
     gameLoop();
   }
 
@@ -413,6 +417,10 @@ var Game = new function () {
     return 1;
   }
 
+  function gamesPlayed() {
+    return game.teamOneWinRecord[0] + game.teamOneWinRecord[1];
+  }
+
   function gameLoop() {
     // console.log ('started gameLoop')
     advanceStage();
@@ -544,7 +552,11 @@ var Game = new function () {
         }
       } else if (bets > 0) {
         for (var j = 0; j < bets; j++) {
-          window.setTimeout(betByXFn(i), Math.random() * game.clock.betStage * 0.9);
+          if (game.clock.betStage > 0) {
+            window.setTimeout(betByXFn(i), Math.random() * game.clock.betStage * 0.9);
+          } else {
+            bet(i);
+          }
         }
       }
     }
@@ -711,10 +723,14 @@ var Game = new function () {
   }
 
   function triggerByClock(callback, time) {
-    if (time >= 0) {
+    var SKIP_STACK_LIMIT = 10;
+
+    if (time > 0 || skipStackCounter > SKIP_STACK_LIMIT) {
+      skipStackCounter = 0;
       // a setTimeout of 0 still waits for 1 stack execution frame
       window.setTimeout(callback, time);
     } else {
+      skipStackCounter++;
       // this callback runs immedately, in the same execution frame
       callback();
     }
@@ -743,6 +759,9 @@ var Game = new function () {
       console.log(message);
 
       game.teamOneWinRecord[teamOneAlive ? 0 : 1]++;
+      if (gamesPlayed() > 0 && gamesPlayed() % 300 == 0) {
+        console.clear();
+      }
       autoAdjustDamageMod();
 
       if (game.render) {
@@ -925,8 +944,8 @@ var Game = new function () {
 
   function reporting(str) {
     switch (str) {
-      case 'stages': return true;
-      default: return true;
+      case 'stages': return false;
+      default: return false;
     }
   }
 
@@ -996,7 +1015,9 @@ var Game = new function () {
   }
 
   function showdown() {
+
     if (reporting('stages')) console.log('showdown');
+
     var completeShowdown = function () {
       var winnings = sendManaToWinners();
       if (game.render) {
@@ -1053,6 +1074,10 @@ var Game = new function () {
       }
       var statsMod = (100 + power) / (100 + defence);
       dam *= statsMod;
+    }
+
+    if (pNum > 4) {
+      dam *= 1.2;
     }
 
     dam = Math.round(dam);

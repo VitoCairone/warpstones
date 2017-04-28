@@ -198,7 +198,6 @@ var Painter = new function () {
   }
 
   function revealElements(nums, cards) {
-    console.log("Revealing " + nums);
     for (var i = 0; i < nums.length; i++) {
       var n = nums[i];
       var elId = 'rev-element-' + n;

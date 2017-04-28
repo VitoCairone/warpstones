@@ -43,7 +43,9 @@ Magnetic = new function() {
       
     window.addEventListener('resize', windowResizeHandler, false);
     windowResizeHandler();
-      
+  }
+
+  this.begin = function() {
     requestAnimationFrame( loop );
   }
 
@@ -252,7 +254,7 @@ Magnetic = new function() {
   }
 
   function createMagnetAndParticles( position ) {
-    console.log("creating magnet at " + JSON.stringify(position))
+    // console.log("creating magnet at " + JSON.stringify(position))
     var m = new Magnet();
     m.position.x = position.x;
     m.position.y = position.y;
@@ -379,7 +381,7 @@ Magnetic = new function() {
       } else {
         p.id = particles.length;
       }
-      console.log("created particle " + p.id);
+      // console.log("created particle " + p.id);
       p.position.x = position.x;
       p.position.y = position.y;
       p.shift.x = position.x;
