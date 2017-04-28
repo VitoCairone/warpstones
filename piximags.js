@@ -268,9 +268,10 @@ Magnetic = new function() {
       var graphic = new PIXI.Graphics();
 
       // don't do this! use generateTextures()
+      // maybe? performance on mobile with this method is fine actually
 
       graphic.beginFill(0xFFFFFF, 0.017);
-      graphic.drawCircle(0, 0, 30);   //(x,y,radius)
+      graphic.drawCircle(0, 0, 45);   //(x,y,radius)
       graphic.endFill();
 
       graphic.beginFill(0x9999FF, 0.025);
@@ -285,27 +286,65 @@ Magnetic = new function() {
       graphic.drawCircle(0, 0, 3);   //(x,y,radius)
       graphic.endFill();
 
-      // var size = 3;
-      // var glowRad = size * 1.5;
-      // var gradientFill = graphic.createRadialGradient(10, 10, 0, 10, 10, glowRad);
-      // gradientFill.addColorStop(0, particle.innerColorStop);
-      // gradientFill.addColorStop(1, 'rgba(0,0,256,0.0)');
-    
-      // // draw the glow
-      // graphic.beginPath();
-      // graphic.fillStyle = gradientFill;
-      // graphic.arc(10, 10, glowRad, 0, Math.PI*2, true);
-      // graphic.fill();
-    
-      // // draw the center
-      // graphic.beginPath();
-      // graphic.fillStyle = '#ffffff';
-      // graphic.arc(10, 10, size/2, 0, Math.PI*2, true);
-      // graphic.fill();
-
       graphic.visible = false;
-      graphics.push(graphic);
-      this.stage.addChild(graphic);
+
+      var redG = new PIXI.Graphics();
+
+      redG.beginFill(0xFFFFFF, 0.017);
+      redG.drawCircle(0, 0, 45);   //(x,y,radius)
+      redG.endFill();
+
+      redG.beginFill(0xFF9999, 0.025);
+      redG.drawCircle(0, 0, 20);   //(x,y,radius)
+      redG.endFill();
+
+      redG.beginFill(0xFF7799, 0.8);
+      redG.drawCircle(0, 0, 6);   //(x,y,radius)
+      redG.endFill();
+
+      redG.beginFill(0xFFFFFF, 1);
+      redG.drawCircle(0, 0, 3);   //(x,y,radius)
+      redG.endFill();
+
+      redG.visible = false;
+
+      graphic.redVersion = redG;
+
+      var glowy = new PIXI.Graphics();
+
+      glowy.beginFill(0xFFFFFF, 0.03);
+      glowy.drawCircle(0, 0, 45);   //(x,y,radius)
+      glowy.endFill();
+
+      glowy.beginFill(0xFFFF99, 0.05);
+      glowy.drawCircle(0, 0, 20);   //(x,y,radius)
+      glowy.endFill();
+
+      glowy.beginFill(0xFFFF77, 0.5);
+      glowy.drawCircle(0, 0, 8);   //(x,y,radius)
+      glowy.endFill();
+
+      glowy.beginFill(0xFFFF77, 0.3);
+      glowy.drawCircle(0, 0, 5);   //(x,y,radius)
+      glowy.endFill();      
+
+      glowy.beginFill(0xFFFFDD, 1);
+      glowy.drawCircle(0, 0, 3);   //(x,y,radius)
+      glowy.endFill();
+
+      glowy.visible = false;
+
+      graphic.glowyVersion = glowy;
+
+      if (Math.random() < 0.7) {
+        graphics.push(graphic);
+      } else if (Math.random() < 0.7) {
+        graphics.push(graphic.redVersion);
+      } else {
+        graphics.push(graphic.glowyVersion);
+      }
+
+      this.stage.addChild(graphics[graphics.length - 1]);
     }
   }
 
