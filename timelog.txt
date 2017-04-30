@@ -23,5 +23,5 @@ Thu 4-27 (Day 10) 10:51p-11:54p (1h03m)
 Fri 4-28 (Day 11) 11:33a-1:33p (2h00m)
   set up for fastrun mode
 
-Sat 4-29 (Day 12) 7:24p-
-  
+Sat 4-29 (Day 12) 7:24p-7:57p (0h33m)
+  added middle button & separator
