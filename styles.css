@@ -36,29 +36,35 @@ body {
   margin: 0;
 }
 
-.fold-button {
-  position: relative; 
-  display: inline-block; 
+.action-button {
+  position: absolute;
+  top: 100px;
   border-radius: 13%; 
   border: 2px solid blue;
   height: 64px; 
-  width: 35%; 
-  margin: 6px 4% 6px 9%; 
+  width: 30%;
+  margin: 0;
+}
+
+
+/*
+1.5 + 30 + 3 + 30 + 3 + 30 + 1.5 = 99
+1.75 + 30 + 3.25 + 30 + 3.25 + 30 + 1.75 = 100
+actual sizing seems off probably because of the
+borders
+*/
+
+.fold-button {
+  left: 1.75%;
+}
+
+.meet-button {
+  left: 35%;
 }
 
 .raise-button {
-  position: relative; 
-  display: inline-block; 
-  border-radius: 13%; 
-  height: 64px; 
-  width: 35%; 
-  border: 2px solid blue;
-  margin: 6px 9% 6px 4%; 
+  left: 68.25%;
 }
-
-/*.action-button {
-  background-color: navy;
-}*/
 
 .spell-button {
   position: absolute;

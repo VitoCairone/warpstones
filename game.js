@@ -1076,10 +1076,6 @@ var Game = new function () {
       dam *= statsMod;
     }
 
-    if (pNum > 4) {
-      dam *= 1.2;
-    }
-
     dam = Math.round(dam);
 
     target.hp -= dam;
@@ -1123,13 +1119,11 @@ var Game = new function () {
     } else {
       spellName = 'Force Blast';
 
-      if (pNum <= 4) {
-        // left team casts at 1/3
-        moteSpend = Math.ceil(player.motes.length / 3);
-      } else {
-        // right team casts at 2/3
-        moteSpend = Math.ceil(player.motes.length * 2 / 3);
-      }
+      moteSpend = Math.ceil(player.motes.length / 3);
+      // if (!teamOneBias(pNum)) {
+      //   // right team casts at 2/3
+      //   moteSpend = Math.ceil(player.motes.length * 2 / 3);
+      // }
 
       // First, destruct particles
 
@@ -1150,6 +1144,10 @@ var Game = new function () {
 
     }
 
+  }
+
+  function teamOneBias(pNum) {
+    return (pNum <= 4);
   }
 }
 

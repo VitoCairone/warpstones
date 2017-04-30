@@ -122,10 +122,6 @@ Magnetic = new function() {
     var from = 0;
     var magnet = magnets[from];
 
-    console.log("amounts = " + amounts);
-    console.log("potParticles = " + magnet.particles.length);
-    // alert('paused');
-
     winner = 1;
     while (magnet.particles.length > 0) {
       while (amounts[winner] == 0) {
