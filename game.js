@@ -77,6 +77,14 @@ var Game = new function () {
     fold(1);
   }
 
+  this.pressMatch = function () {
+    if (game.inputPhase == 'match') {
+      meet(1);
+    } else if (game.inputPhase == 'bet') {
+      check(1);
+    }
+  }
+
   this.pressBet = function () {
     if (game.inputPhase == 'bet') {
       bet(1);
@@ -441,6 +449,10 @@ var Game = new function () {
 
     if (player.folded || player.allIn || diff == 0) {
       return 0;
+    }
+
+    if (game.render) {
+      game.painter.animateMeet(pNum);
     }
 
     var amount = diff;
@@ -1153,4 +1165,4 @@ var Game = new function () {
 
 Game.init();
 
-console.log('finished game.js read');
+console.log('finished game.js read'); 

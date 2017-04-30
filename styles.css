@@ -58,7 +58,7 @@ borders
   left: 1.75%;
 }
 
-.meet-button {
+.match-button {
   left: 35%;
 }
 
@@ -296,6 +296,15 @@ borders
   border-radius: 13% 13% 13% 13%
 }
 
+#match-overlay {
+  position: absolute;
+  background-color: navy;
+  height: 0%;
+  width: 100%;
+  bottom: 0px;
+  border-radius: 13% 13% 13% 13% 
+}
+
 #defend-overlay {
   position: absolute;
   background-color: navy;
@@ -306,6 +315,10 @@ borders
 }
 
 #defend-overlay.defend {
+  height: 100%;
+}
+
+#match-overlay.matched {
   height: 100%;
 }
 

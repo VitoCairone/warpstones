@@ -17,6 +17,7 @@
 
   <SCRIPT>
     pressFold = new function () {};
+    pressMatch = new function () {};
     pressBet = new function () {};
     pressSpellLock = new function () {};
     pressContinue = new function () {};
@@ -158,8 +159,8 @@
           </div>
         </div>
 
-        <div id="meetButton" class="action-button meet-button" onclick="pressFold()">
-          <div id="meet-overlay">
+        <div id="matchButton" class="action-button match-button" onclick="pressMatch()">
+          <div id="match-overlay">
           </div>
           <div class="center-text">
             MATCH
@@ -290,6 +291,7 @@
     })();
 
     pressFold = Game.pressFold;
+    pressMatch = Game.pressMatch;
     pressBet = Game.pressBet;
     pressSpellLock = Game.pressSpellLock;
     pressContinue = Game.pressContinue;

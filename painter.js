@@ -27,15 +27,21 @@ var Painter = new function () {
   //   };
   // }
 
-  this.animateSendWinnings = function (winnings) {
-    Magnetic.distributeParticles(winnings);
-  }
-
   this.animateResetTimerBar = function () {
     // console.log('resetting timer bar');
     // document.getElementById('progress-bar-fill').style.width = "0%";
     document.getElementById('progress-bar-fill').classList.remove('bet-stage', 'match-stage');
     // document.getElementById('progress-bar-fill').classList.add('reset');
+  }
+
+  this.animateSendWinnings = function (winnings) {
+    Magnetic.distributeParticles(winnings);
+  }
+
+  this.animateMeet = function (pNum) {
+    if (pNum == 1) {
+      document.getElementById('match-overlay').classList.add('matched');
+    }
   }
 
   this.animateGrantNewParticles = function (pNum, gain) {
@@ -195,6 +201,7 @@ var Painter = new function () {
   this.zeroBetOverlay = function () {
     document.getElementById('bet-count-overlay').className = "";
     document.getElementById('defend-overlay').className = "";
+    document.getElementById('match-overlay').className = "";
   }
 
   function revealElements(nums, cards) {
