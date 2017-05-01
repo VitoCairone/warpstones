@@ -853,7 +853,7 @@ var Game = new function () {
   function findWinners(pot) {
     if (pot.eligible.length == 0) {
       alert("ERROR: no eligible players in findWinners");
-      return;
+      return [];
     }
 
     var pNum = null;
@@ -863,6 +863,15 @@ var Game = new function () {
     
     for (var i = 0; i < pot.eligible.length; i++) {
       pNum = pot.eligible[i];
+
+      // We still need to skip folded players here because
+      // any side pot created by a newAllIn can include
+      // other players who are not pushed all in on that round,
+      // players who might fold in later rounds, before the showdown.
+      if (game.players[pNum].folded) {
+        continue;
+      }
+
       score = game.players[pNum].gestaltRank;
       if (score > topScore) {
         topScore = score;
@@ -870,6 +879,10 @@ var Game = new function () {
       } else if (score == topScore) {
         topScoreNums.push(pNum);
       }
+    }
+
+    if (topScore === 0) {
+      alert('ERROR: all eligible players have folded in findWinners');
     }
 
     return topScoreNums;
