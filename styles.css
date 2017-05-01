@@ -649,29 +649,16 @@ by the left edge? */
 #progress-bar-fill.bet-stage {
   transition-property: width;
   transition-timing-function: linear;
-  transition-duration: 5s;
-  width: 71.4%;
-  /*transition-property: width;
-  transition-duration: 5s;
-  transition-timing-function: linear;*/
-/*  -webkit-transition-property: width;
-  -webkit-transition-duration: 3s;
-  -webkit-transition-delay: 0s;
-  -webkit-transition-timing-function: linear;*/
+  transition-duration: 3500ms;
+  transition-delay: 0ms;
+  width: 70%;
 }
 
 #progress-bar-fill.match-stage {
   transition-property: width;
   transition-timing-function: linear;
-  transition-duration: 2s;
+  transition-duration: 1500ms;
   width: 100%;
-  /*transition-property: width;
-  transition-duration: 2s;
-  transition-timing-function: linear;*/
-/*  -webkit-transition-property: width;
-  -webkit-transition-duration: 3s;
-  -webkit-transition-delay: 0s;
-  -webkit-transition-timing-function: linear;*/
 }
 
 #end-game-report-box {
