@@ -38,7 +38,7 @@ body {
 
 .action-button {
   position: absolute;
-  top: 100px;
+  top: 38px;
   border-radius: 13%; 
   border: 2px solid blue;
   height: 64px; 
@@ -69,8 +69,10 @@ borders
 .spell-button {
   position: absolute;
   border-radius: 13%;
-  height: 54px;
+  top: 120px;
+  height: 60px;
   width: 20%;
+  margin: 0;
   background-color: navy;
   border: 2px solid blue;
 }
@@ -116,7 +118,7 @@ borders
 }
 
 .spell-button .center-text {
-  top: 10px;
+  top: 20px;
 }
 
 .dark-orb {
@@ -645,6 +647,10 @@ by the left edge? */
   top: 0px;
   background-color: tan;
 }
+
+/* in the future, override these transition times
+programmaticaly with the game clock's time for the phase;
+right now these values are NOT overriden */
 
 #progress-bar-fill.bet-stage {
   transition-property: width;
