@@ -276,8 +276,8 @@ Magnetic = new function() {
       // don't do this! use generateTextures()
       // maybe? performance on mobile with this method is fine actually
 
-      graphic.beginFill(0xFFFFFF, 0.017);
-      graphic.drawCircle(0, 0, 45);   //(x,y,radius)
+      graphic.beginFill(0xFFFFFF, 0.01);
+      graphic.drawCircle(0, 0, 35);   //(x,y,radius)
       graphic.endFill();
 
       graphic.beginFill(0x9999FF, 0.025);
@@ -296,8 +296,8 @@ Magnetic = new function() {
 
       var redG = new PIXI.Graphics();
 
-      redG.beginFill(0xFFFFFF, 0.017);
-      redG.drawCircle(0, 0, 45);   //(x,y,radius)
+      redG.beginFill(0xFFFFFF, 0.01);
+      redG.drawCircle(0, 0, 35);   //(x,y,radius)
       redG.endFill();
 
       redG.beginFill(0xFF9999, 0.025);
@@ -316,8 +316,8 @@ Magnetic = new function() {
 
       var glowy = new PIXI.Graphics();
 
-      glowy.beginFill(0xFFFFFF, 0.03);
-      glowy.drawCircle(0, 0, 45);   //(x,y,radius)
+      glowy.beginFill(0xFFFFFF, 0.022);
+      glowy.drawCircle(0, 0, 40);   //(x,y,radius)
       glowy.endFill();
 
       glowy.beginFill(0xFFFF99, 0.05);
