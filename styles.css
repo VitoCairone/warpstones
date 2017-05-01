@@ -639,7 +639,7 @@ by the left edge? */
 
 #progress-bar-separator {
   position: absolute;
-  left: 60%;
+  left: 70%;
   height: 30px;
   width: 10px;
   top: 0px;
