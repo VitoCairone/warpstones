@@ -44,6 +44,7 @@ body {
   height: 64px; 
   width: 30%;
   margin: 0;
+  background-color: navy;
 }
 
 .action-button.disabled {
@@ -83,23 +84,39 @@ actual sizing seems off probably because of the borders
   top: 22px; 
   width: 100%; 
   text-align: center; 
-  font-size: 14px;
+  font-size: 18px;
   color: white;
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 }
 
 .action-button.disabled .center-text {
   color: darkred;
+  font-size: 19px;
+  text-shadow: none;
+}
+
+#match-text {
+  display: none;
+}
+
+#actionButtons.match-phase #match-text {
+  display: initial;
+}
+
+#actionButtons.match-phase #check-text {
+  display: none;
 }
 
 #bet-count-overlay {
   position: absolute;
-  background-color: navy;
+  background-color: skyblue;
   height: 0%;
   width: 100%;
   bottom: 0px;
   border-radius: 13% 13% 13% 13%
 }
 
+/*
 #match-overlay {
   position: absolute;
   background-color: navy;
@@ -117,6 +134,7 @@ actual sizing seems off probably because of the borders
   bottom: 0px;
   border-radius: 13% 13% 13% 13% 
 }
+*/
 
 #defend-overlay.defend {
   height: 100%;

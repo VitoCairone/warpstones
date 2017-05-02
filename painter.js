@@ -44,7 +44,8 @@ var Painter = new function () {
 
   this.animateMeet = function (pNum) {
     if (pNum == 1) {
-      document.getElementById('match-overlay').classList.add('matched');
+      // document.getElementById('match-overlay').classList.add('matched');
+      document.getElementById('matchButton').classList.add('activated');
     }
   }
 
@@ -66,6 +67,7 @@ var Painter = new function () {
 
   this.showCheckButton = function () {
     document.getElementById('actionButtons').classList.remove('match-phase');
+    document.getElementById('matchButton').classList.remove('activated');
   }
 
   this.showMatchButton = function () {
@@ -113,7 +115,7 @@ var Painter = new function () {
   this.animateFold = function (pNum) {
     if (pNum == 1) {
       // document.getElementById('defend-overlay').classList.add('defend');
-      document.getElementById('defend-overlay').classList.add('activated');
+      document.getElementById('foldButton').classList.add('activated');
       document.getElementById('betButton').classList.add('disabled');
       document.getElementById('matchButton').classList.add('disabled');
     }
@@ -215,8 +217,8 @@ var Painter = new function () {
 
   this.zeroBetOverlay = function () {
     document.getElementById('bet-count-overlay').className = "";
-    document.getElementById('defend-overlay').className = "";
-    document.getElementById('match-overlay').className = "";
+    // document.getElementById('defend-overlay').className = "";
+    // document.getElementById('match-overlay').className = "";
 
     var btnEls = ['foldButton', 'matchButton', 'betButton']
     for (var i = 0; i < btnEls.length; i++) {
