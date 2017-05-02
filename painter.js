@@ -38,6 +38,10 @@ var Painter = new function () {
     Magnetic.distributeParticles(winnings);
   }
 
+  this.animateTransitionPhase = function () {
+    ;
+  }
+
   this.animateMeet = function (pNum) {
     if (pNum == 1) {
       document.getElementById('match-overlay').classList.add('matched');
@@ -58,6 +62,14 @@ var Painter = new function () {
       // document.getElementById('progress-bar-fill').classList.remove('reset');
       document.getElementById('progress-bar-fill').classList.add('bet-stage');
     }, 50)
+  }
+
+  this.showBetButton = function () {
+    document.getElementById('actionButtons').classList.remove('match-phase');
+  }
+
+  this.showMatchButton = function () {
+    document.getElementById('actionButtons').classList.add('match-phase');
   }
 
   this.animateMatchTimerBar = function () {

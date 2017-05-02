@@ -21,6 +21,7 @@ var Game = new function () {
   var clocks = {
     normal: {
       betStage: 3500,
+      transitionPhase: 200,
       matchStage: 1500,
       spellLocking: 2000,
       spellCasting: 2000,
@@ -28,6 +29,7 @@ var Game = new function () {
     },
     fast: {
       betStage: 350,
+      transitionPhase: 20,
       matchStage: 150,
       spellLocking: 200,
       spellCasting: 750, // note: projectile CSS animation runs in 700 ms
@@ -35,6 +37,7 @@ var Game = new function () {
     },
     runhot: {
       betStage: 0,
+      transitionPhase: 0,
       matchStage: 0,
       spellLocking: 0,
       spellCasting: 0,
@@ -320,13 +323,14 @@ var Game = new function () {
   }
 
   function endBetStage() { 
-    startMatchStage();
+    startTransitionPhase();
   }
 
   function endGame() {
     ;
   }
 
+  // This function is TOO BIG, chop it up!!
   function endMatchStage() {
 
     game.inputPhase = null;
@@ -393,6 +397,10 @@ var Game = new function () {
     }
 
     advanceStage();
+  }
+
+  function endTransitionPhase() {
+    startMatchStage();
   }
 
   function fold(pNum) {
@@ -532,6 +540,7 @@ var Game = new function () {
     if (game.render) {
       game.painter.animateBetTimerBar();
       game.painter.resetMaxMarked();
+      game.painter.showBetButton();
     }
 
     game.maxWager = 0;
@@ -580,6 +589,7 @@ var Game = new function () {
 
     if (game.render) {
       game.painter.animateMatchTimerBar();
+      game.painter.showMatchButton();
     }
 
     var players = game.players;
@@ -594,6 +604,16 @@ var Game = new function () {
 
     // alert('completed startMatchStage');
     triggerByClock(endMatchStage, game.clock.matchStage);
+  }
+
+  function startTransitionPhase() {
+    game.inputPhase = 'transition';
+
+    if (game.render) {
+      game.painter.animateTransitionPhase();
+    }
+
+    triggerByClock(endTransitionPhase, game.clock.transitionPhase)
   }
 
   function startNewGame() {
