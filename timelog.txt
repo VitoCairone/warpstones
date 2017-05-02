@@ -32,5 +32,6 @@ Sun 4-30 (Day 13) 9:16p-10:00p (0h44m)
 Mon 5-1 (Day 14) 10:58-11:43 (0h46m)
   work on action button interface
 
-Mon 5-2 (Day 15) 12:00p-
+Mon 5-2 (Day 15) 12:00p-1:02 (1h02m)
   refine specs for action buttons
+  implement most button styling

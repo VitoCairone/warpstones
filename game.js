@@ -589,7 +589,9 @@ var Game = new function () {
 
     if (game.render) {
       game.painter.animateMatchTimerBar();
-      game.painter.showMatchButton();
+      if (!(game.players[1].folded || game.players[1].allIn)) {
+        game.painter.showMatchButton();
+      }
     }
 
     var players = game.players;
