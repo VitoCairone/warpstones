@@ -64,7 +64,7 @@ var Painter = new function () {
     }, 50)
   }
 
-  this.showBetButton = function () {
+  this.showCheckButton = function () {
     document.getElementById('actionButtons').classList.remove('match-phase');
   }
 
@@ -112,7 +112,10 @@ var Painter = new function () {
 
   this.animateFold = function (pNum) {
     if (pNum == 1) {
-      document.getElementById('defend-overlay').classList.add('defend');
+      // document.getElementById('defend-overlay').classList.add('defend');
+      document.getElementById('defend-overlay').classList.add('activated');
+      document.getElementById('betButton').classList.add('disabled');
+      document.getElementById('matchButton').classList.add('disabled');
     }
     Magnetic.contractParticles(pNum);
   }
@@ -214,6 +217,12 @@ var Painter = new function () {
     document.getElementById('bet-count-overlay').className = "";
     document.getElementById('defend-overlay').className = "";
     document.getElementById('match-overlay').className = "";
+
+    var btnEls = ['foldButton', 'matchButton', 'betButton']
+    for (var i = 0; i < btnEls.length; i++) {
+      document.getElementById(btnEls[i]).classList.remove('disabled', 'activated');
+    }
+    
   }
 
   function revealElements(nums, cards) {
