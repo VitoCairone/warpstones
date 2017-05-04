@@ -6,6 +6,10 @@ var Painter = new function () {
     return;
   }
 
+  this.animateCheck = function () {
+    document.getElementById('matchButton').classList.add('activated');
+  }
+
   this.animateDamage = function (pNum, amount) {
     var el = document.getElementById('damage-popup-' + pNum);
     el.innerHTML = amount;
@@ -71,6 +75,7 @@ var Painter = new function () {
   }
 
   this.showMatchButton = function () {
+    document.getElementById('matchButton').classList.remove('disabled', 'activated');
     document.getElementById('actionButtons').classList.add('match-phase');
   }
 

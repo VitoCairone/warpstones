@@ -224,7 +224,10 @@ var Game = new function () {
   // proceed. So, check is NOT implicit behavior
   // of the fold button, which always fold.
   function check(pNum) {
-    ;
+    game.players[pNum].checked = true;
+    if (pNum == 1) {
+      game.painter.animateCheck();
+    }
   }
 
   function checkForCapture() {
@@ -323,6 +326,10 @@ var Game = new function () {
   }
 
   function endBetStage() { 
+    for (var i = 0; i <= 8; i++) {
+      var player = game.players[i];
+      player.checked = false;
+    }
     startTransitionPhase();
   }
 
@@ -546,6 +553,7 @@ var Game = new function () {
     game.maxWager = 0;
     for (var i = 1; i <= 8; i++) {
       var player = game.players[i];
+      player.checked = false;
       if (player.folded) {
         continue;
       }
