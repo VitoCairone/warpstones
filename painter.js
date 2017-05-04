@@ -3,7 +3,10 @@ var Painter = new function () {
   this.manaDraw = Magnetic;
 
   this.animateAllIn = function (pNum) {
-    return;
+    if (pNum == 1) {
+      document.getElementById('foldButton').classList.add('disabled');
+      document.getElementById('matchButton').classList.add('disabled');
+    }
   }
 
   this.animateCheck = function () {
