@@ -583,9 +583,9 @@ var Game = new function () {
 
     for (var k = 1; k <= 8; k++) {
       i = shuffleNums[k];
-      // if (game.disableP1bot && i == 1) {
-      //   continue;
-      // }
+      if (game.disableP1bot && i == 1) {
+        continue;
+      }
 
       var player = game.players[i];
       if (player.folded || player.allIn) {
@@ -1039,10 +1039,6 @@ var Game = new function () {
   }
 
   function sendManaToWinners() {
-    //game.counterSync = Math.round(Math.random() * 1000000);
-    // a counterSync of 0 should favor team 1 over team 2...
-    game.counterSync = 0;
-
     var winnings = [null, 0, 0, 0, 0, 0, 0, 0, 0];
     var pNum = null;
     var amount = 0;
