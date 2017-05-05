@@ -12,6 +12,8 @@
 
 console.log('start game.js read');
 
+var MT = new MersenneTwister(7);
+
 var Game = new function () {
 
   var gameCounter = 0;
@@ -56,15 +58,15 @@ var Game = new function () {
     warpMotes: [],
     startMotes: 21,
     motesPerRound: 7,
-    render: true,
+    render: false,
     painter: null,
-    clock: clocks.normal,
+    clock: clocks.runhot,
     newAllIns: [],
     sidePots: [],
     baseDamageMod: 5.5,
     inputPhase: null,
     teamOneWinRecord: [0, 0],
-    disableP1bot: true
+    disableP1bot: false
   }
 
   this.begin = function () {
@@ -125,11 +127,14 @@ var Game = new function () {
       game.baseDamageMod = Math.round(game.baseDamageMod * 100 * (1 - autoAdjustSize)) / 100;
     }
     autoAdjustSize *= 0.999;
+    var t1 = game.teamOneWinRecord[0];
+    var t2 = game.teamOneWinRecord[1];
     console.log("######################################");
     console.log("######################################");
     console.log("######################################");
     console.log("###### baseDamageMod set to " + game.baseDamageMod);
-    console.log("###### team1 win record " + game.teamOneWinRecord[0] + "-" + game.teamOneWinRecord[1]);
+    console.log("###### team1 win record " + t1 + "-" + t2);
+    console.log("###### bias: "  + Math.round(1000 * (t1 / (t1 + t2) - 0.5)) / 1000);
     console.log("#######################################");
   }
 
@@ -230,7 +235,7 @@ var Game = new function () {
       return;
     }
 
-    if (pNum == 1) {
+    if (pNum == 1 && game.render) {
       game.painter.animateCheck();
     }
 
@@ -302,15 +307,10 @@ var Game = new function () {
   }
 
   function decideBets(pNum) {
-    // in this stub, pNum is actually unused
-    // split up decision making so that stage 1
-    // doesn't go force all-in so often
-    if (Math.random() > 0.3) {
-      //aggro
-      return Math.floor(Math.random() * 10) - 2;
+    if (MT.random() > 0.3) {
+      return Math.floor(MT.random() * 10) - 2;
     } else {
-      //normal
-      return Math.floor(Math.random() * 7) - 2;
+      return Math.floor(MT.random() * 7) - 2;
     }
   }
 
@@ -333,7 +333,7 @@ var Game = new function () {
   }
 
   function endBetStage() { 
-    for (var i = 0; i <= 8; i++) {
+    for (var i = 1; i <= 8; i++) {
       var player = game.players[i];
       player.checked = false;
     }
@@ -533,12 +533,17 @@ var Game = new function () {
       , j = 0
       , temp = null;
 
+    var k = 0;
     for (i = array.length - 1; i > 0; i -= 1) {
-      j = Math.floor(Math.random() * (i + 1))
+      j = Math.floor(MT.random() * (i + 1));
       temp = array[i]
       array[i] = array[j]
       array[j] = temp
     }
+
+    // return a pointer to array for convenience
+    // however, array is modified in-place
+    return array;
   }
 
   function shuffleCards() {
@@ -572,10 +577,15 @@ var Game = new function () {
       return bet.bind(null, x);
     }
 
-    for (var i = 1; i <= 8; i++) {
-      if (game.disableP1bot && i == 1) {
-        continue;
-      }
+    var shuffleNums = [1, 2, 3, 4, 5, 6, 7, 8]
+    shuffle(shuffleNums);
+    shuffleNums = [0].concat(shuffleNums);
+
+    for (var k = 1; k <= 8; k++) {
+      i = shuffleNums[k];
+      // if (game.disableP1bot && i == 1) {
+      //   continue;
+      // }
 
       var player = game.players[i];
       if (player.folded || player.allIn) {
@@ -589,6 +599,8 @@ var Game = new function () {
       } else if (bets > 0) {
         for (var j = 0; j < bets; j++) {
           if (game.clock.betStage > 0) {
+            // note that betByXFn(i) is called immediately
+            // and the returned function is passed to setTimeout
             window.setTimeout(betByXFn(i), Math.random() * game.clock.betStage * 0.9);
           } else {
             bet(i);
@@ -772,7 +784,7 @@ var Game = new function () {
   }
 
   function triggerByClock(callback, time) {
-    var SKIP_STACK_LIMIT = 10;
+    var SKIP_STACK_LIMIT = 20;
 
     if (time > 0 || skipStackCounter > SKIP_STACK_LIMIT) {
       skipStackCounter = 0;
@@ -807,7 +819,21 @@ var Game = new function () {
       var message = 'game ended in ' + game.rounds + ' rounds';
       console.log(message);
 
-      game.teamOneWinRecord[teamOneAlive ? 0 : 1]++;
+      if (teamOneAlive != teamTwoAlive) {
+        game.teamOneWinRecord[teamOneAlive ? 0 : 1]++;
+      } else {
+
+        // there are never ties because of a problem of spellcasting
+        // at present: spells are cast in strict serial order, and a ghost
+        // cannot cast a spell; so when two players should mutually KO,
+        // the second will not spellcast at all because they are found
+        // to be a ghost at casting time
+
+        alert('tie!');
+        game.teamOneRecord[0] += 0.5;
+        game.teamOneRecord[1] += 0.5;
+      }
+
       if (gamesPlayed() > 0 && gamesPlayed() % 300 == 0) {
         console.clear();
       }
@@ -926,6 +952,7 @@ var Game = new function () {
   }
 
   function gestaltRank(gestalt) {
+
     var score = 0;
     var hashEls = {};
     var presentEls = [];
@@ -1012,7 +1039,9 @@ var Game = new function () {
   }
 
   function sendManaToWinners() {
-    game.counterSync = Math.round(Math.random() * 1000000);
+    //game.counterSync = Math.round(Math.random() * 1000000);
+    // a counterSync of 0 should favor team 1 over team 2...
+    game.counterSync = 0;
 
     var winnings = [null, 0, 0, 0, 0, 0, 0, 0, 0];
     var pNum = null;
@@ -1064,11 +1093,14 @@ var Game = new function () {
         sidePot.motes = sidePot.motes.slice(amount, Infinity);
       }
 
-      while (sidePot.motes.length >  0) {
-        var pNum = winners[(++game.counterSync) % winners.length];
-        var mote = sidePot.motes.pop();
-        game.players[pNum].motes.push(mote);
-        winnings[pNum]++;
+      if (sidePot.motes.length > 0) {
+        shuffle(winners);
+        while (sidePot.motes.length > 0) {
+          var pNum = winners.pop();
+          var mote = sidePot.motes.pop();
+          game.players[pNum].motes.push(mote);
+          winnings[pNum]++;
+        }
       }
 
     }
@@ -1092,19 +1124,7 @@ var Game = new function () {
           game.winners.push(i);
         }
       }
-
-      // var winners = game.winners;
-      // var winnings = game.winnings;
-
-      // var counterSync = Math.floor(Math.random() * winners.length);
-
-      // distribute motes evenly to winners
-      // var count = counterSync;
-      // while (game.warpMotes.length > 0) {
-      //   var mote = game.warpMotes.pop();
-      //   game.players[winners[count]].motes.push(mote);
-      //   count = (count + 1) % winners.length;
-      // }
+      shuffle(game.winners);
 
       triggerByClock(advanceStage, game.clock.spellLocking);
     }
@@ -1182,10 +1202,6 @@ var Game = new function () {
       spellName = 'Force Blast';
 
       moteSpend = Math.ceil(player.motes.length / 3);
-      // if (!teamOneBias(pNum)) {
-      //   // right team casts at 2/3
-      //   moteSpend = Math.ceil(player.motes.length * 2 / 3);
-      // }
 
       // First, destruct particles
 

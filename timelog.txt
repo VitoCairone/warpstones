@@ -44,8 +44,11 @@ Tue 5-2 (Day 15) 12:00p-1:02 (1h02m)
 Wed 5-3 (Day 16) unknown (01m)
   push update to github pages only
 
-Thu 5-4 (Day 17) 11:41a- 
+Thu 5-4 (Day 17) 11:41a-1:14 (1h33m)
   lookup testing -- see Mocha, PhantomJS, Selenium
   set new priority issues
+  check button display states
+  bias debugging
 
-
+Fri 5-5 (Day 18) 11:53-
+  balance - diagnose mystery bias (about -.03 ?)
