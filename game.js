@@ -12,7 +12,7 @@
 
 console.log('start game.js read');
 
-var MT = new MersenneTwister(7);
+var MT = new MersenneTwister();
 
 var Game = new function () {
 
@@ -27,6 +27,10 @@ var Game = new function () {
       matchStage: 1500,
       spellLocking: 2000,
       spellCasting: 2000,
+      manaMove: 0,
+      manaSpend: 0,
+      spellFlight: 700, // note: projectile CSS animation runs in 700 ms
+      showDamage: 500, // note: damage popup CSS animation runs in 500 ms
       autoRestartDelay: 5000
     },
     fast: {
@@ -34,7 +38,11 @@ var Game = new function () {
       transitionPhase: 20,
       matchStage: 150,
       spellLocking: 200,
-      spellCasting: 750, // note: projectile CSS animation runs in 700 ms
+      spellCasting: 750,
+      manaMove: 0,
+      manaSpend: 0,
+      spellFlight: 700,
+      showDamage: 500,
       autoRestartDelay: 5000
     },
     runhot: {
@@ -43,6 +51,10 @@ var Game = new function () {
       matchStage: 0,
       spellLocking: 0,
       spellCasting: 0,
+      manaMove: 0,
+      manaSpend: 0,
+      spellFlight: 0,
+      showDamage: 0,
       autoRestartDelay: 0
     }
   }
@@ -78,6 +90,15 @@ var Game = new function () {
     gameLoop();
   }
 
+  this.init = function () {
+    for (var i = 0; i < 7; i++) {
+      game.cards = game.cards.concat(game.elements);
+    }
+    game.cards = game.cards.concat(['void', 'void', 'gold']);
+
+    reset();
+  }
+
   this.pressFold = function () {
     fold(1);
   }
@@ -109,15 +130,6 @@ var Game = new function () {
     game.painter = painter;
   }
 
-  this.init = function () {
-    for (var i = 0; i < 7; i++) {
-      game.cards = game.cards.concat(game.elements);
-    }
-    game.cards = game.cards.concat(['void', 'void', 'gold']);
-
-    reset();
-  }
-
   function autoAdjustDamageMod() {
     var ROUNDS_TARGET = 22;
     gameCounter++;
@@ -136,35 +148,6 @@ var Game = new function () {
     console.log("###### team1 win record " + t1 + "-" + t2);
     console.log("###### bias: "  + Math.round(1000 * (t1 / (t1 + t2) - 0.5)) / 1000);
     console.log("#######################################");
-  }
-
-  function reset() {
-
-    game.stage = -1;
-    game.rounds = 0;
-    game.captureTo = null;
-    game.warpMotes = [];
-    game.newAllIns = [];
-    game.sidePots = [];
-
-    var names = [null, 'Alan', 'Betty', 'Carl', 'Diane', 'Ed', 'Felicia', 'Gary', 'Helen']
-
-    for (var i = 1; i <= 8; i++) {
-      game.players[i] = {
-        name: names[i],
-        hp: 700,
-        thisStageBet: 0,
-        folded: false,
-        allIn: false,
-        ghost: false,
-        motes: [],
-        wager: 0
-      }
-      for (var j = 0; j < (game.startMotes - game.motesPerRound); j++) {
-        game.players[i].motes.push(10); // 10 is just a placeholder value
-      }
-    }
-
   }
 
   function advanceStage() {
@@ -266,7 +249,7 @@ var Game = new function () {
       return;
     }
     if (outstanding == 0) {
-      // a pot with outstanding 0 means two players
+      // a pot with outstanding 0 means two or more players
       // went all-in with exactly the same amount of mana.
       // The first side-pot handles their wager completely,
       // so don't create another
@@ -281,10 +264,6 @@ var Game = new function () {
       }
     }
 
-    // at this point, all this bet mana has actually already been
-    // pushed into the warp. So, we need to extract the motes which are
-    // specific to this side pot from there.
-
     var amount = null;
     if (requirement == outstanding) {
       // this is the first sidePot being created within this stage
@@ -295,7 +274,9 @@ var Game = new function () {
       amount += eligible.length * outstanding;
     }
 
-    // console.log("Transferring " + amount + " from warp to side pot");
+    // at this point, all this bet mana has actually already been
+    // pushed into the warp. So, we need to extract the motes which are
+    // specific to this side pot from there.
 
     var transfer = game.warpMotes.slice(0, amount);
     game.warpMotes = game.warpMotes.slice(amount, Infinity);
@@ -504,6 +485,35 @@ var Game = new function () {
     console.log(msg);
   }
 
+  function reset() {
+
+    game.stage = -1;
+    game.rounds = 0;
+    game.captureTo = null;
+    game.warpMotes = [];
+    game.newAllIns = [];
+    game.sidePots = [];
+
+    var names = [null, 'Alan', 'Betty', 'Carl', 'Diane', 'Ed', 'Felicia', 'Gary', 'Helen']
+
+    for (var i = 1; i <= 8; i++) {
+      game.players[i] = {
+        name: names[i],
+        hp: 700,
+        thisStageBet: 0,
+        folded: false,
+        allIn: false,
+        ghost: false,
+        motes: [],
+        wager: 0
+      }
+      for (var j = 0; j < (game.startMotes - game.motesPerRound); j++) {
+        game.players[i].motes.push(10); // 10 is just a placeholder value
+      }
+    }
+
+  }
+
   function setAllIn(pNum) {
     game.players[pNum].allIn = true;
     game.newAllIns.push(pNum);
@@ -635,7 +645,6 @@ var Game = new function () {
     }
     game.maxWager = maxWager;
 
-    // alert('completed startMatchStage');
     triggerByClock(endMatchStage, game.clock.matchStage);
   }
 
@@ -837,8 +846,8 @@ var Game = new function () {
         // there are never ties because of a problem of spellcasting
         // at present: spells are cast in strict serial order, and a ghost
         // cannot cast a spell; so when two players should mutually KO,
-        // the second will not spellcast at all because they are found
-        // to be a ghost at casting time
+        // the second will be found a ghost and so will not cast at all,
+        // or will cast Revive
 
         alert('tie!');
         game.teamOneRecord[0] += 0.5;
@@ -1162,15 +1171,23 @@ var Game = new function () {
 
     target.hp -= dam;
 
+    var thisCheckFaint = checkForFaint.bind(null, targNum);
     if (game.render) {
       game.painter.animateDamage(targNum, dam);
+      triggerByClock(thisCheckFaint, game.clock.showDamage);
+    } else {
+      thisCheckFaint();
     }
+  }
 
-    // console.log(player.name + ' spent ' + moteSpend + ' mana to cast force blast on ' + target.name + ' for ' + dam + ' damage.');
-
-    // console.log(target.name + ' has ' + target.hp + ' health remaining.');
-
-    checkForFaint(targNum);
+  function spellFlight(pNum, targNum, spellName, moteSpend) {
+    var thisSpellStrike = spellStrike.bind(null, pNum, targNum, spellName, moteSpend);
+    if (game.render && spellName == 'Force Blast') {
+      game.painter.animateForceBlast(pNum, targNum);
+      window.setTimeout(thisSpellStrike, game.clock.spellFlight);
+    } else if (spellName == 'Force Blast') {
+      thisSpellStrike();
+    }
   }
 
   function spellCast(pNum) {
@@ -1210,19 +1227,14 @@ var Game = new function () {
 
       player.motes = player.motes.slice(moteSpend, player.motes.length);
 
+      var thisSpellFlight = spellFlight.bind(null, pNum, targNum, spellName, moteSpend);
       if (game.render) {
+        // wait until any manaSpend animation has finished for spellFlight
         game.painter.destructParticles(pNum, moteSpend);
+        triggerByClock(thisSpellFlight, game.clock.manaSpend);
+      } else {
+        thisSpellFlight();
       }
-
-      // Then, transit spell, applying strike after
-
-      if (game.render && spellName == 'Force Blast') {
-        game.painter.animateForceBlast(pNum, targNum);
-        window.setTimeout(spellStrike.bind(null, pNum, targNum, 'Force Blast', moteSpend), 700);
-      } else if (spellName == 'Force Blast') {
-        spellStrike(pNum, targNum, 'Force Blast', moteSpend);
-      }
-
     }
 
   }
