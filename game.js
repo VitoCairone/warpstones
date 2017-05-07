@@ -72,7 +72,7 @@ var Game = new function () {
     motesPerRound: 7,
     render: true,
     painter: null,
-    clock: clocks.fast,
+    clock: clocks.normal,
     newAllIns: [],
     sidePots: [],
     baseDamageMod: 5.5,
@@ -130,6 +130,14 @@ var Game = new function () {
     game.painter = painter;
   }
 
+  function advanceStage() {
+    game.stage = (game.stage + 1) % 6
+    if (game.stage == 0) {
+      game.rounds += 1;
+    }
+    startStage();
+  }
+
   function autoAdjustDamageMod() {
     var ROUNDS_TARGET = 22;
     gameCounter++;
@@ -148,14 +156,6 @@ var Game = new function () {
     console.log("###### team1 win record " + t1 + "-" + t2);
     console.log("###### bias: "  + Math.round(1000 * (t1 / (t1 + t2) - 0.5)) / 1000);
     console.log("#######################################");
-  }
-
-  function advanceStage() {
-    game.stage = (game.stage + 1) % 6
-    if (game.stage == 0) {
-      game.rounds += 1;
-    }
-    startStage();
   }
 
   function bet(pNum) {  
@@ -205,6 +205,15 @@ var Game = new function () {
     return 1;
   }
 
+  function botSpellCasting() {
+    var winners = game.winners;
+    winners.forEach(function (winnerIdx) {
+      if (true || winnerIdx != 1) {
+        spellCast(winnerIdx);
+      }
+    });
+  }
+
   // check is the action of the 'middle button'
   // during bet phase; the one which becomes Meet.
   // once Bet is disabled.
@@ -237,6 +246,18 @@ var Game = new function () {
     }
     if (canAct == 1) {
       game.captureTo = leaderIdx;
+    }
+  }
+
+  function checkForFaint(pNum) {
+    var player = game.players[pNum];
+    if (player.hp <= 0 && !player.ghost) {
+      // console.log(player.name + ' has fainted!');
+      player.hp = 0;
+      player.ghost = true;
+      if (game.render) {
+        game.painter.faintSprite(pNum);
+      }
     }
   }
 
@@ -305,12 +326,58 @@ var Game = new function () {
     return count;
   }
 
-  function endSpellCasting() {
-    if (detectWinCondition()) {
-      endGame();
-    } else {
-      advanceStage();
+  function detectWinCondition() {
+    var teamOneAlive = false;
+    var teamTwoAlive = false;
+
+    for (var i = 1; i <= 4 && teamOneAlive == false; i++) {
+      if (!game.players[i].ghost) {
+        teamOneAlive = true;
+      }
     }
+
+    for (var i = 5; i <= 8 && teamTwoAlive == false; i++) {
+      if (!game.players[i].ghost) {
+        teamTwoAlive = true;
+      }
+    }
+
+    if ( (!teamOneAlive) || (!teamTwoAlive) ) {
+      var elapsed = new Date().getTime() - game.startTime;
+      // var message = 'game ended in ' + (elapsed / (60 * 1000)) + ' min';
+      var message = 'game ended in ' + game.rounds + ' rounds';
+      console.log(message);
+
+      if (teamOneAlive != teamTwoAlive) {
+        game.teamOneWinRecord[teamOneAlive ? 0 : 1]++;
+      } else {
+
+        // there are never ties because of a problem of spellcasting
+        // at present: spells are cast in strict serial order, and a ghost
+        // cannot cast a spell; so when two players should mutually KO,
+        // the second will be found a ghost and so will not cast at all,
+        // or will cast Revive
+
+        alert('tie!');
+        game.teamOneRecord[0] += 0.5;
+        game.teamOneRecord[1] += 0.5;
+      }
+
+      if (gamesPlayed() > 0 && gamesPlayed() % 300 == 0) {
+        console.clear();
+      }
+      autoAdjustDamageMod();
+
+      if (game.render) {
+        game.painter.animateEnd(teamOneAlive, teamTwoAlive);
+      }
+
+      triggerByClock(startNewGame, game.clock.autoRestartDelay);
+
+      return true;
+    }
+
+    return false;
   }
 
   function endBetStage() { 
@@ -394,8 +461,58 @@ var Game = new function () {
     advanceStage();
   }
 
+  function endSpellCasting() {
+    if (detectWinCondition()) {
+      endGame();
+    } else {
+      advanceStage();
+    }
+  }
+
+  function endSpellLocking() {
+    advanceStage();
+  }
+
   function endTransitionPhase() {
     startMatchStage();
+  }
+
+  function findWinners(pot) {
+    if (pot.eligible.length == 0) {
+      alert("ERROR: no eligible players in findWinners");
+      return [];
+    }
+
+    var pNum = null;
+    var score = 0;
+    var topScore = 0;
+    var topScoreNums = [];
+    
+    for (var i = 0; i < pot.eligible.length; i++) {
+      pNum = pot.eligible[i];
+
+      // We still need to skip folded players here because
+      // any side pot created by a newAllIn can include
+      // other players who are not pushed all in on that round,
+      // players who might fold in later rounds, before the showdown.
+      if (game.players[pNum].folded) {
+        continue;
+      }
+
+      score = game.players[pNum].gestaltRank;
+      if (score > topScore) {
+        topScore = score;
+        topScoreNums = [pNum];
+      } else if (score == topScore) {
+        topScoreNums.push(pNum);
+      }
+    }
+
+    if (topScore === 0) {
+      alert('ERROR: all eligible players have folded in findWinners');
+    }
+
+    return topScoreNums;
   }
 
   function fold(pNum) {
@@ -428,13 +545,57 @@ var Game = new function () {
     return 1;
   }
 
+  function gameLoop() {
+    // console.log ('started gameLoop')
+    advanceStage();
+  }
+
   function gamesPlayed() {
     return game.teamOneWinRecord[0] + game.teamOneWinRecord[1];
   }
 
-  function gameLoop() {
-    // console.log ('started gameLoop')
-    advanceStage();
+  function gestaltRank(gestalt) {
+
+    var score = 0;
+    var hashEls = {};
+    var presentEls = [];
+
+    for (var i = 0; i < gestalt.length; i++) {
+      var el = gestalt[i];
+      if (el in hashEls) {
+        hashEls[el] += 1;
+      } else {
+        hashEls[el] = 1;
+        presentEls.push(el);
+      }
+    }
+
+    countsArr = [0, 0, 0, 0, 0, 0, 0, 0];
+    for (var i = 0; i < presentEls.length; i++) {
+      var el = presentEls[i];
+      countsArr[hashEls[el]] += 1;
+    }
+
+    var pow10 = 1;
+    for (var i = 1; i <= 7; i++) {
+      var multiple = countsArr[i];
+      score += multiple * pow10;
+      pow10 *= 10;
+    }
+
+    if ('gold' in hashEls) {
+      score += 1;
+    }
+
+    if ('void' in hashEls && hashEls['void'] == 2) {
+      score += 1000000000;
+    }
+
+    return score;
+  }
+
+  function getCommonCards() {
+    return game.cards.slice(16, 21);
   }
 
   function getPlayerCards(pNum) {
@@ -442,8 +603,8 @@ var Game = new function () {
     return [game.cards[idx * 2], game.cards[idx * 2 + 1]];
   }
 
-  function getCommonCards() {
-    return game.cards.slice(16, 21);
+  function getPlayerStat(player, stat) {
+    return 0;
   }
 
   function meet(pNum) {
@@ -481,6 +642,30 @@ var Game = new function () {
     return 1;
   }
 
+  function pickTargetNum(pNum) {
+    var targetPriorities = [
+      null,
+      [5, 6, 7, 8],
+      [6, 5, 7, 8],
+      [7, 8, 6, 5],
+      [8, 7, 6, 5],
+      [1, 2, 3, 4],
+      [2, 1, 3, 4],
+      [3, 4, 2, 1],
+      [4, 3, 2, 1]
+    ];
+
+    var targets = targetPriorities[pNum];
+
+    for (var i = 0; i < 4; i++) {
+      if (!game.players[targets[i]].ghost) {
+        return targets[i];
+      }
+    }
+    // guess the game is over! just return normal target
+    return targets[0];
+  }
+
   function report(code, msg) {
     console.log(msg);
   }
@@ -514,13 +699,70 @@ var Game = new function () {
 
   }
 
-  function setAllIn(pNum) {
-    game.players[pNum].allIn = true;
-    game.newAllIns.push(pNum);
+  function sendManaToWinners() {
+    var winnings = [null, 0, 0, 0, 0, 0, 0, 0, 0];
+    var pNum = null;
+    var amount = 0;
 
-    if (game.render) {
-      game.painter.animateAllIn(pNum);
+    setGestaltRanks();
+
+    // presuming it exists, push the final pot as another sidePot
+    // so we don't need any special logic for it
+    if (game.warpMotes.length > 0) {
+      var eligible = [];
+      for (var i = 1; i <= 8; i++) {
+        if ((!game.players[i].folded) && (!game.players[i].allIn)) {
+          eligible.push(i);
+        }
+      }
+      game.sidePots.push({
+        eligible: eligible,
+        motes: game.warpMotes
+      });
+      game.warpMotes = [];
     }
+
+    // this routine goes through every side pot, from newest first
+    // -- not because it's important but just because push/pop alone is
+    // simpler than adding shift/unshift --
+    // and distributes motes to every winner of each side pot.
+    // In the simplest case, when there is one pot and one winner, that
+    // one pot was just added as the final (and only) side pot. All motes
+    // are sent to the one winner, and there is no remainder. However,
+    // if there are side pots and/or multiple winners, motes must be
+    // distributed whole and undivided, in an unbiased way.
+
+    while (game.sidePots.length > 0) {
+
+      var sidePot = game.sidePots.pop();
+
+      // console.log("sidePot = ");
+      // console.log(sidePot);
+
+      var winners = findWinners(sidePot);
+
+      amount = Math.floor(sidePot.motes.length / winners.length);
+
+      for (var i = 0; i < winners.length; i++) {
+        pNum = winners[i];
+        winnings[pNum] += amount;
+        game.players[pNum].motes = game.players[pNum].motes.concat(sidePot.motes.slice(0, amount));
+        sidePot.motes = sidePot.motes.slice(amount, Infinity);
+      }
+
+      if (sidePot.motes.length > 0) {
+        shuffle(winners);
+        while (sidePot.motes.length > 0) {
+          var pNum = winners.pop();
+          var mote = sidePot.motes.pop();
+          game.players[pNum].motes.push(mote);
+          winnings[pNum]++;
+        }
+      }
+
+    }
+
+    return winnings;
   }
 
   function sendMotesToWarp(pNum, amount) {
@@ -539,6 +781,26 @@ var Game = new function () {
     var transfer = player.motes.slice(0, amount);
     player.motes = player.motes.slice(amount, Infinity)
     game.warpMotes = game.warpMotes.concat(transfer);
+  }
+
+  function setAllIn(pNum) {
+    game.players[pNum].allIn = true;
+    game.newAllIns.push(pNum);
+
+    if (game.render) {
+      game.painter.animateAllIn(pNum);
+    }
+  }
+
+  function showContestCards() {
+    var contestNums = [];
+    for (var i = 1; i <= 8; i++) {
+      var player = game.players[i];
+      if (!player.folded) {
+        contestNums.push(i);
+      }
+    }
+    game.painter.showPersonalCardsFor(contestNums, game.cards);
   }
 
   function shuffle (array) {
@@ -562,6 +824,125 @@ var Game = new function () {
 
   function shuffleCards() {
     shuffle(game.cards);
+  }
+
+  function showdown() {
+
+    var completeShowdown = function () {
+      var winnings = sendManaToWinners();
+      if (game.render) {
+        game.painter.animateSendWinnings(winnings);
+      }
+
+      game.winners = [];
+      for (var i = 1; i <= 8; i++) {
+        if (winnings[i] > 0) {
+          game.winners.push(i);
+        }
+      }
+      shuffle(game.winners);
+
+      triggerByClock(advanceStage, game.clock.spellLocking);
+    }
+
+    if (game.render) {
+      // allow time to see the revealed personal cards,
+      // and also for mana from final matches to be collected, 
+      // before distributing to winners
+      window.setTimeout(completeShowdown, 1000);
+    } else {
+      completeShowdown()
+    }
+  }
+
+  function spellCast(pNum) {
+    var player = game.players[pNum];
+
+    var targNum = pickTargetNum(pNum);
+    var target = game.players[targNum];
+
+    var moteSpend = 0;
+    var spellName = null;
+
+    var reviveCost = 100;
+
+    if (player.ghost && player.motes.length >= reviveCost) {
+      spellName = 'Revive';
+      // console.log(player.name + ' cast Revive.');
+      // console.log(player.name + ' has revived with 500 hp.');
+      moteSpend = reviveCost;
+      player.hp = 500;
+      player.ghost = false;
+      if (game.render) {
+        game.painter.reviveSprite(pNum);
+      }
+    } else if (player.ghost) {
+      spellName = 'Boo!';
+      manaSpend = 0;
+      // console.log(player.name + ' cast Boo!')
+    } else {
+      spellName = 'Force Blast';
+
+      moteSpend = Math.ceil(player.motes.length / 3);
+      if (teamOneBias(pNum)) {
+        moteSpend = Math.ceil(player.motes.length * 2 / 3);
+      }
+
+      // First, destruct particles
+
+      player.motes = player.motes.slice(moteSpend, player.motes.length);
+
+      var thisSpellFlight = spellFlight.bind(null, pNum, targNum, spellName, moteSpend);
+      if (game.render) {
+        // wait until any manaSpend animation has finished for spellFlight
+        game.painter.destructParticles(pNum, moteSpend);
+        triggerByClock(thisSpellFlight, game.clock.manaSpend);
+      } else {
+        thisSpellFlight();
+      }
+    }
+  }
+
+  function spellFlight(pNum, targNum, spellName, moteSpend) {
+    var thisSpellStrike = spellStrike.bind(null, pNum, targNum, spellName, moteSpend);
+    if (game.render && spellName == 'Force Blast') {
+      game.painter.animateForceBlast(pNum, targNum);
+      window.setTimeout(thisSpellStrike, game.clock.spellFlight);
+    } else if (spellName == 'Force Blast') {
+      thisSpellStrike();
+    }
+  }
+
+  function spellStrike(pNum, targNum, spellName, moteSpend) {
+
+    var player = game.players[pNum];
+    var target = game.players[targNum];
+
+    var dam = game.baseDamageMod * moteSpend;
+
+    if (target.ghost) {
+      dam = 0;
+    } else {
+      var power = getPlayerStat(player, 'power');
+      var defence = getPlayerStat(target, 'defence');
+      if (target.folded) {
+        defence += 49;
+      }
+      var statsMod = (100 + power) / (100 + defence);
+      dam *= statsMod;
+    }
+
+    dam = Math.round(dam);
+
+    target.hp -= dam;
+
+    var thisCheckFaint = checkForFaint.bind(null, targNum);
+    if (game.render) {
+      game.painter.animateDamage(targNum, dam);
+      triggerByClock(thisCheckFaint, game.clock.showDamage);
+    } else {
+      thisCheckFaint();
+    }
   }
 
   function startBetStage() { 
@@ -646,16 +1027,6 @@ var Game = new function () {
     game.maxWager = maxWager;
 
     triggerByClock(endMatchStage, game.clock.matchStage);
-  }
-
-  function startTransitionPhase() {
-    game.inputPhase = 'transition';
-
-    if (game.render) {
-      game.painter.animateTransitionPhase();
-    }
-
-    triggerByClock(endTransitionPhase, game.clock.transitionPhase)
   }
 
   function startNewGame() {
@@ -793,6 +1164,51 @@ var Game = new function () {
     }
   }
 
+  function startTransitionPhase() {
+    game.inputPhase = 'transition';
+
+    if (game.render) {
+      game.painter.animateTransitionPhase();
+    }
+
+    triggerByClock(endTransitionPhase, game.clock.transitionPhase)
+  }
+
+  function startSpellLocking() {
+    ;
+  }
+
+  function startSpellCasting() {
+    botSpellCasting();
+  }
+  
+  function setGestaltRanks() {
+    for (var i = 1; i <= 8; i++) {
+      // skip folded players because they are never eligible,
+      // even for side pots
+      if (game.players[i].folded) {
+        continue;
+      }
+      var player = game.players[i];
+      var gestalt = getCommonCards().concat(getPlayerCards(i));
+      var score = gestaltRank(gestalt);
+
+      player.gestalt = gestalt;
+      player.gestaltRank = score;
+
+      var shortHand = [];
+      for (var j = 0; j < gestalt.length; j++) {
+        shortHand.push(gestalt[j].charAt(0).toUpperCase())
+      }
+      // console.log(player.name + ' has ' + shortHand.join('') + ' worth ' + score);
+      // game.players[i].score = score;
+    }
+  }
+
+  function teamOneBias(pNum) {
+    return (pNum <= 4);
+  }
+
   function totalMana() {
     var total = 0;
     var players = game.players;
@@ -817,431 +1233,6 @@ var Game = new function () {
     }
   }
 
-  function detectWinCondition() {
-    var teamOneAlive = false;
-    var teamTwoAlive = false;
-
-    for (var i = 1; i <= 4 && teamOneAlive == false; i++) {
-      if (!game.players[i].ghost) {
-        teamOneAlive = true;
-      }
-    }
-
-    for (var i = 5; i <= 8 && teamTwoAlive == false; i++) {
-      if (!game.players[i].ghost) {
-        teamTwoAlive = true;
-      }
-    }
-
-    if ( (!teamOneAlive) || (!teamTwoAlive) ) {
-      var elapsed = new Date().getTime() - game.startTime;
-      // var message = 'game ended in ' + (elapsed / (60 * 1000)) + ' min';
-      var message = 'game ended in ' + game.rounds + ' rounds';
-      console.log(message);
-
-      if (teamOneAlive != teamTwoAlive) {
-        game.teamOneWinRecord[teamOneAlive ? 0 : 1]++;
-      } else {
-
-        // there are never ties because of a problem of spellcasting
-        // at present: spells are cast in strict serial order, and a ghost
-        // cannot cast a spell; so when two players should mutually KO,
-        // the second will be found a ghost and so will not cast at all,
-        // or will cast Revive
-
-        alert('tie!');
-        game.teamOneRecord[0] += 0.5;
-        game.teamOneRecord[1] += 0.5;
-      }
-
-      if (gamesPlayed() > 0 && gamesPlayed() % 300 == 0) {
-        console.clear();
-      }
-      autoAdjustDamageMod();
-
-      if (game.render) {
-        game.painter.animateEnd(teamOneAlive, teamTwoAlive);
-      }
-
-      triggerByClock(startNewGame, game.clock.autoRestartDelay);
-
-      return true;
-    }
-
-    return false;
-  }
-
-  function botSpellCasting() {
-    var winners = game.winners;
-    winners.forEach(function (winnerIdx) {
-      if (true || winnerIdx != 1) {
-        spellCast(winnerIdx);
-      }
-    });
-  }
-
-  function showContestCards() {
-    var contestNums = [];
-    for (var i = 1; i <= 8; i++) {
-      var player = game.players[i];
-      if (!player.folded) {
-        contestNums.push(i);
-      }
-    }
-    game.painter.showPersonalCardsFor(contestNums, game.cards);
-  }
-
-  function startSpellLocking() {
-    ;
-  }
-
-  function startSpellCasting() {
-    botSpellCasting();
-  }
-
-  function endSpellLocking() {
-    advanceStage();
-  }
-
-  function setGestaltRanks() {
-    for (var i = 1; i <= 8; i++) {
-      // skip folded players because they are never eligible,
-      // even for side pots
-      if (game.players[i].folded) {
-        continue;
-      }
-      var player = game.players[i];
-      var gestalt = getCommonCards().concat(getPlayerCards(i));
-      var score = gestaltRank(gestalt);
-
-      player.gestalt = gestalt;
-      player.gestaltRank = score;
-
-      var shortHand = [];
-      for (var j = 0; j < gestalt.length; j++) {
-        shortHand.push(gestalt[j].charAt(0).toUpperCase())
-      }
-      // console.log(player.name + ' has ' + shortHand.join('') + ' worth ' + score);
-      // game.players[i].score = score;
-    }
-  }
-
-  function findWinners(pot) {
-    if (pot.eligible.length == 0) {
-      alert("ERROR: no eligible players in findWinners");
-      return [];
-    }
-
-    var pNum = null;
-    var score = 0;
-    var topScore = 0;
-    var topScoreNums = [];
-    
-    for (var i = 0; i < pot.eligible.length; i++) {
-      pNum = pot.eligible[i];
-
-      // We still need to skip folded players here because
-      // any side pot created by a newAllIn can include
-      // other players who are not pushed all in on that round,
-      // players who might fold in later rounds, before the showdown.
-      if (game.players[pNum].folded) {
-        continue;
-      }
-
-      score = game.players[pNum].gestaltRank;
-      if (score > topScore) {
-        topScore = score;
-        topScoreNums = [pNum];
-      } else if (score == topScore) {
-        topScoreNums.push(pNum);
-      }
-    }
-
-    if (topScore === 0) {
-      alert('ERROR: all eligible players have folded in findWinners');
-    }
-
-    return topScoreNums;
-  }
-
-  function gestaltRank(gestalt) {
-
-    var score = 0;
-    var hashEls = {};
-    var presentEls = [];
-
-    for (var i = 0; i < gestalt.length; i++) {
-      var el = gestalt[i];
-      if (el in hashEls) {
-        hashEls[el] += 1;
-      } else {
-        hashEls[el] = 1;
-        presentEls.push(el);
-      }
-    }
-
-    countsArr = [0, 0, 0, 0, 0, 0, 0, 0];
-    for (var i = 0; i < presentEls.length; i++) {
-      var el = presentEls[i];
-      countsArr[hashEls[el]] += 1;
-    }
-
-    var pow10 = 1;
-    for (var i = 1; i <= 7; i++) {
-      var multiple = countsArr[i];
-      score += multiple * pow10;
-      pow10 *= 10;
-    }
-
-    if ('gold' in hashEls) {
-      score += 1;
-    }
-
-    if ('void' in hashEls && hashEls['void'] == 2) {
-      score += 1000000000;
-    }
-
-    return score;
-  }
-
-  function getPlayerStat(player, stat) {
-    return 0;
-  }
-
-  function checkForFaint(pNum) {
-    var player = game.players[pNum];
-    if (player.hp <= 0 && !player.ghost) {
-      // console.log(player.name + ' has fainted!');
-      player.hp = 0;
-      player.ghost = true;
-      if (game.render) {
-        game.painter.faintSprite(pNum);
-      }
-    }
-  }
-
-  function pickTargetNum(pNum) {
-    var targetPriorities = [
-      null,
-      [5, 6, 7, 8],
-      [6, 5, 7, 8],
-      [7, 8, 6, 5],
-      [8, 7, 6, 5],
-      [1, 2, 3, 4],
-      [2, 1, 3, 4],
-      [3, 4, 2, 1],
-      [4, 3, 2, 1]
-    ];
-
-    var targets = targetPriorities[pNum];
-
-    for (var i = 0; i < 4; i++) {
-      if (!game.players[targets[i]].ghost) {
-        return targets[i];
-      }
-    }
-    // guess the game is over! just return normal target
-    return targets[0];
-  }
-
-  function reporting(str) {
-    switch (str) {
-      case 'stages': return false;
-      default: return false;
-    }
-  }
-
-  function sendManaToWinners() {
-    var winnings = [null, 0, 0, 0, 0, 0, 0, 0, 0];
-    var pNum = null;
-    var amount = 0;
-
-    setGestaltRanks();
-
-    // presuming it exists, push the final pot as another sidePot
-    // so we don't need any special logic for it
-    if (game.warpMotes.length > 0) {
-      var eligible = [];
-      for (var i = 1; i <= 8; i++) {
-        if ((!game.players[i].folded) && (!game.players[i].allIn)) {
-          eligible.push(i);
-        }
-      }
-      game.sidePots.push({
-        eligible: eligible,
-        motes: game.warpMotes
-      });
-      game.warpMotes = [];
-    }
-
-    // this routine goes through every side pot, from newest first
-    // -- not because it's important but just because push/pop alone is
-    // simpler than adding shift/unshift --
-    // and distributes motes to every winner of each side pot.
-    // In the simplest case, when there is one pot and one winner, that
-    // one pot was just added as the final (and only) side pot. All motes
-    // are sent to the one winner, and there is no remainder. However,
-    // if there are side pots and/or multiple winners, motes must be
-    // distributed whole and undivided, in an unbiased way.
-
-    while (game.sidePots.length > 0) {
-
-      var sidePot = game.sidePots.pop();
-
-      // console.log("sidePot = ");
-      // console.log(sidePot);
-
-      var winners = findWinners(sidePot);
-
-      amount = Math.floor(sidePot.motes.length / winners.length);
-
-      for (var i = 0; i < winners.length; i++) {
-        pNum = winners[i];
-        winnings[pNum] += amount;
-        game.players[pNum].motes = game.players[pNum].motes.concat(sidePot.motes.slice(0, amount));
-        sidePot.motes = sidePot.motes.slice(amount, Infinity);
-      }
-
-      if (sidePot.motes.length > 0) {
-        shuffle(winners);
-        while (sidePot.motes.length > 0) {
-          var pNum = winners.pop();
-          var mote = sidePot.motes.pop();
-          game.players[pNum].motes.push(mote);
-          winnings[pNum]++;
-        }
-      }
-
-    }
-
-    return winnings;
-  }
-
-  function showdown() {
-
-    if (reporting('stages')) console.log('showdown');
-
-    var completeShowdown = function () {
-      var winnings = sendManaToWinners();
-      if (game.render) {
-        game.painter.animateSendWinnings(winnings);
-      }
-
-      game.winners = [];
-      for (var i = 1; i <= 8; i++) {
-        if (winnings[i] > 0) {
-          game.winners.push(i);
-        }
-      }
-      shuffle(game.winners);
-
-      triggerByClock(advanceStage, game.clock.spellLocking);
-    }
-
-    if (game.render) {
-      // allow time to see the revealed personal cards,
-      // and also for mana from final matches to be collected, 
-      // before distributing to winners
-      window.setTimeout(completeShowdown, 1000);
-    } else {
-      completeShowdown()
-    }
-  }
-
-  function spellStrike(pNum, targNum, spellName, moteSpend) {
-
-    var player = game.players[pNum];
-    var target = game.players[targNum];
-
-    var dam = game.baseDamageMod * moteSpend;
-
-    if (target.ghost) {
-      dam = 0;
-    } else {
-      var power = getPlayerStat(player, 'power');
-      var defence = getPlayerStat(target, 'defence');
-      if (target.folded) {
-        defence += 49;
-      }
-      var statsMod = (100 + power) / (100 + defence);
-      dam *= statsMod;
-    }
-
-    dam = Math.round(dam);
-
-    target.hp -= dam;
-
-    var thisCheckFaint = checkForFaint.bind(null, targNum);
-    if (game.render) {
-      game.painter.animateDamage(targNum, dam);
-      triggerByClock(thisCheckFaint, game.clock.showDamage);
-    } else {
-      thisCheckFaint();
-    }
-  }
-
-  function spellFlight(pNum, targNum, spellName, moteSpend) {
-    var thisSpellStrike = spellStrike.bind(null, pNum, targNum, spellName, moteSpend);
-    if (game.render && spellName == 'Force Blast') {
-      game.painter.animateForceBlast(pNum, targNum);
-      window.setTimeout(thisSpellStrike, game.clock.spellFlight);
-    } else if (spellName == 'Force Blast') {
-      thisSpellStrike();
-    }
-  }
-
-  function spellCast(pNum) {
-    var player = game.players[pNum];
-
-    var targNum = pickTargetNum(pNum);
-    var target = game.players[targNum];
-
-    var moteSpend = 0;
-    var spellName = null;
-
-    var reviveCost = 100;
-
-    if (player.ghost && player.motes.length >= reviveCost) {
-      spellName = 'Revive';
-      // console.log(player.name + ' cast Revive.');
-      // console.log(player.name + ' has revived with 500 hp.');
-      moteSpend = reviveCost;
-      player.hp = 500;
-      player.ghost = false;
-      if (game.render) {
-        game.painter.reviveSprite(pNum);
-      }
-    } else if (player.ghost) {
-      spellName = 'Boo!';
-      manaSpend = 0;
-      // console.log(player.name + ' cast Boo!')
-    } else {
-      spellName = 'Force Blast';
-
-      moteSpend = Math.ceil(player.motes.length / 3);
-      if (teamOneBias(pNum)) {
-        moteSpend = Math.ceil(player.motes.length * 2 / 3);
-      }
-
-      // First, destruct particles
-
-      player.motes = player.motes.slice(moteSpend, player.motes.length);
-
-      var thisSpellFlight = spellFlight.bind(null, pNum, targNum, spellName, moteSpend);
-      if (game.render) {
-        // wait until any manaSpend animation has finished for spellFlight
-        game.painter.destructParticles(pNum, moteSpend);
-        triggerByClock(thisSpellFlight, game.clock.manaSpend);
-      } else {
-        thisSpellFlight();
-      }
-    }
-
-  }
-
-  function teamOneBias(pNum) {
-    return (pNum <= 4);
-  }
 }
 
 Game.init();
