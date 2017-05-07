@@ -24,5 +24,4 @@ Apr 28 -- 1/3 spend vs 2/3 spend & 1.2x dam;
 // seed 7, deciding, shuffle-act&spell&sendTo: -.001 at 2k-2k
 // seed 99, deciding, shuffle-act&spell&sendTo: -.002 at 2k-2k
 
-// seed 7, with free +7 power: +.045 at 1k-1k
-// seed 7, with free +21 power: +.045 at 1k-1k
+// seed 7, 2/3 blast vs 1/3 blast: +.022 at 4k-4k

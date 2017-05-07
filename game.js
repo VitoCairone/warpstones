@@ -58,9 +58,9 @@ var Game = new function () {
     warpMotes: [],
     startMotes: 21,
     motesPerRound: 7,
-    render: false,
+    render: true,
     painter: null,
-    clock: clocks.runhot,
+    clock: clocks.fast,
     newAllIns: [],
     sidePots: [],
     baseDamageMod: 5.5,
@@ -168,7 +168,7 @@ var Game = new function () {
   }
 
   function advanceStage() {
-    game.stage = (game.stage + 1) % 5
+    game.stage = (game.stage + 1) % 6
     if (game.stage == 0) {
       game.rounds += 1;
     }
@@ -324,7 +324,7 @@ var Game = new function () {
     return count;
   }
 
-  function endSpellCastingStage() {
+  function endSpellCasting() {
     if (detectWinCondition()) {
       endGame();
     } else {
@@ -498,6 +498,10 @@ var Game = new function () {
     }
 
     return 1;
+  }
+
+  function report(code, msg) {
+    console.log(msg);
   }
 
   function setAllIn(pNum) {
@@ -720,6 +724,9 @@ var Game = new function () {
   function startStage() {
     game.newAllIns.length = 0;
     game.stageStartMana = game.warpMotes.length;
+
+    report('stage', 'STARTING STAGE ' + game.stage);
+
     switch (game.stage) {
       case 0:
         // flop
@@ -765,8 +772,12 @@ var Game = new function () {
         showdown();
         break;
       case 4:
-        //casting
-        spellLocking();
+        startSpellLocking();
+        triggerByClock(endSpellLocking, game.clock.spellLocking);
+      break;
+      case 5:
+        startSpellCasting();
+        triggerByClock(endSpellCasting, game.clock.spellCasting);
       break;
       default:
         alert('startStage encountered default');
@@ -871,23 +882,16 @@ var Game = new function () {
     game.painter.showPersonalCardsFor(contestNums, game.cards);
   }
 
-  function spellLocking() {
-    var winners = game.winners;
-
-    // console.log("Total mana before casting = " + totalMana());
-
-    // when rendering, the strike is DELAYED by the time for
-    // the animation to complete, so behavior here is async!!
-
-    botSpellCasting();
-
-    // console.log("Total mana after casting = " + totalMana());
-
-    triggerByClock(endSpellCastingStage, game.clock.spellCasting);
+  function startSpellLocking() {
+    ;
   }
 
-  function timeoutSpellLock() {
-    return;
+  function startSpellCasting() {
+    botSpellCasting();
+  }
+
+  function endSpellLocking() {
+    advanceStage();
   }
 
   function setGestaltRanks() {
@@ -1198,6 +1202,9 @@ var Game = new function () {
       spellName = 'Force Blast';
 
       moteSpend = Math.ceil(player.motes.length / 3);
+      if (teamOneBias(pNum)) {
+        moteSpend = Math.ceil(player.motes.length * 2 / 3);
+      }
 
       // First, destruct particles
 

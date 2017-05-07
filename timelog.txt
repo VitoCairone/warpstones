@@ -50,5 +50,7 @@ Thu 5-4 (Day 17) 11:41a-1:14 (1h33m)
   check button display states
   bias debugging
 
-Fri 5-5 (Day 18) 11:53-
-  balance - diagnose mystery bias (about -.03 ?)
+Fri 5-5 (Day 18) 11:53-1:53 (2h00m)
+  resolved mystery bias around -.03 to +/- .002
+
+Sat 5-6 (Day 19) 6:14p-
