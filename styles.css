@@ -3,7 +3,7 @@
 }
 
 body {
-  background-image: url('star-background.jpg');
+  background-image: url('images/star-background.jpg');
   background-size: 180px 180px;
 }
 
@@ -361,7 +361,7 @@ actual sizing seems off probably because of the borders
   position: absolute;
   height: 31px;
   width: 30px;
-  background: url('piskel3.png') left center;
+  background: url('images/piskel3.png') left center;
   /*background-size: 30px 40px;*/
   background-position: 0px, 0px;
   /*background-color: blue;*/
@@ -467,7 +467,7 @@ actual sizing seems off probably because of the borders
   visibility: hidden;
   width: 33px;
   height: 30px;
-  background: url('piskel2.gif') left center;
+  background: url('images/piskel2.gif') left center;
   background-position: -100px -10px;
 }
 
@@ -594,7 +594,7 @@ by the left edge? */
 
 .desert-background {
   /*background-image: url('http://68.media.tumblr.com/81c221724f7f5b05f8e8b72ea0cf393f/tumblr_o0aurfiKlq1sm9gg5o1_500.png');*/
-  background-image: url('desert.png');
+  background-image: url('images/desert.png');
 }
 
 #glyph {
@@ -729,7 +729,7 @@ right now these values are NOT overriden */
     width: 30px;
     height: 33px;
     margin-bottom: 7px;
-    background: url('ghosts.png') left top;
+    background: url('images/ghosts.png') left top;
     background-position: 0px -72px;
     
 /*    -webkit-animation: play .8s steps(3) infinite;

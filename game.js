@@ -78,7 +78,7 @@ var Game = new function () {
     baseDamageMod: 5.5,
     inputPhase: null,
     teamOneWinRecord: [0, 0],
-    disableP1bot: false
+    disableP1bot: true
   };
 
   this.begin = function () {

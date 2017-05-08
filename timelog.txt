@@ -36,7 +36,6 @@ Mon 5-1 (Day 14) 10:58-11:43 (0h46m)
 
 ** week 2 total: 7h31m
 
-
 Tue 5-2 (Day 15) 12:00p-1:02 (1h02m)
   refine specs for action buttons
   implement most button styling
@@ -53,4 +52,8 @@ Thu 5-4 (Day 17) 11:41a-1:14 (1h33m)
 Fri 5-5 (Day 18) 11:53-1:53 (2h00m)
   resolved mystery bias around -.03 to +/- .002
 
-Sat 5-6 (Day 19) 6:14p-
+Sat 5-6 (Day 19) 6:14p-7:24p (1h10m)
+  timing control and linting
+
+Sun 5-7 (Day 20) 8:40p-
+  move images to folder
