@@ -214,6 +214,10 @@ var Game = new function () {
     });
   }
 
+  function canPlayerOneAct() {
+    return (!game.players[1].allIn && !game.players[1].folded);
+  }
+
   // check is the action of the 'middle button'
   // during bet phase; the one which becomes Meet.
   // once Bet is disabled.
@@ -1008,13 +1012,6 @@ var Game = new function () {
 
     game.inputPhase = "match";
 
-    if (game.render) {
-      game.painter.animateMatchTimerBar();
-      if (!(game.players[1].folded || game.players[1].allIn)) {
-        game.painter.showMatchButton();
-      }
-    }
-
     var players = game.players;
 
     var maxWager = 0;
@@ -1024,6 +1021,18 @@ var Game = new function () {
       }
     }
     game.maxWager = maxWager;
+
+    if (game.render) {
+      game.painter.animateMatchTimerBar();
+
+      var matchAmountPercent = 100 * game.maxWager / game.roundStartMana[1];
+      if (matchAmountPercent > 100) {
+        matchAmountPercent = 100;
+      }
+      if (!(game.players[1].folded || game.players[1].allIn)) {
+        game.painter.showMatchButton(matchAmountPercent);
+      }
+    }
 
     triggerByClock(endMatchStage, game.clock.matchStage);
   }
@@ -1115,6 +1124,7 @@ var Game = new function () {
         }
         shuffleCards();
         if (game.render) {
+          game.painter.stageStartEnableButtons();
           game.painter.zeroBetOverlay();
           game.painter.showPersonalCardsFor([1], game.cards);
           game.painter.showFlopCards(game.cards);
@@ -1125,6 +1135,9 @@ var Game = new function () {
       case 1:
         // turn
         if (game.render) {
+          if (canPlayerOneAct()) {
+            game.painter.stageStartEnableButtons();
+          }
           game.painter.showTurnCards(game.cards);
         }
         startBetStage();
@@ -1133,6 +1146,9 @@ var Game = new function () {
       case 2:
         // river
         if (game.render) {
+          if (canPlayerOneAct()) {
+            game.painter.stageStartEnableButtons();
+          }
           game.painter.showRiverCard(game.cards);
         }
         startBetStage();

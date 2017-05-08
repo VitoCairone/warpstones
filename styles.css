@@ -113,17 +113,25 @@ actual sizing seems off probably because of the borders
   height: 0%;
   width: 100%;
   bottom: 0px;
-  border-radius: 13% 13% 13% 13%
+  border-radius: 13% 13% 13% 13%;
 }
 
-/*
+
 #match-overlay {
   position: absolute;
-  background-color: navy;
+  background-color: mediumblue;
   height: 0%;
   width: 100%;
   bottom: 0px;
-  border-radius: 13% 13% 13% 13% 
+  border-radius: 13% 13% 13% 13%;
+}
+
+.activated #match-overlay {
+  background-color: deepskyblue;
+}
+
+.disabled #match-overlay {
+  background-color: silver;
 }
 
 #defend-overlay {
@@ -132,16 +140,16 @@ actual sizing seems off probably because of the borders
   height: 0%;
   width: 100%;
   bottom: 0px;
-  border-radius: 13% 13% 13% 13% 
+  border-radius: 13% 13% 13% 13%;
 }
-*/
+
 
 #defend-overlay.defend {
   height: 100%;
 }
 
-#match-overlay.matched {
-  height: 100%;
+.disabled #bet-count-overlay {
+  background-color: silver;
 }
 
 #bet-count-overlay.count-1 {

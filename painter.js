@@ -5,12 +5,17 @@ var Painter = new function () {
   this.animateAllIn = function (pNum) {
     if (pNum == 1) {
       document.getElementById('foldButton').classList.add('disabled');
-      document.getElementById('matchButton').classList.add('disabled');
+      // document.getElementById('matchButton').classList.add('disabled');
+
+      // make sure bet button is activated, even if got here by meet,
+      // because meet button will be deactivated...
+      // document.getElementById('betButton').classList.add('activated');
     }
   }
 
   this.animateCheck = function () {
     document.getElementById('matchButton').classList.add('activated');
+    document.getElementById('betButton').classList.add('disabled');
   }
 
   this.animateDamage = function (pNum, amount) {
@@ -53,6 +58,10 @@ var Painter = new function () {
     if (pNum == 1) {
       // document.getElementById('match-overlay').classList.add('matched');
       document.getElementById('matchButton').classList.add('activated');
+
+      document.getElementById('foldButton').classList.add('disabled');
+
+      document.getElementById('betButton').classList.add('disabled');
     }
   }
 
@@ -73,13 +82,16 @@ var Painter = new function () {
   }
 
   this.showCheckButton = function () {
+    document.getElementById('match-overlay').style.height = "0%";
     document.getElementById('actionButtons').classList.remove('match-phase');
     document.getElementById('matchButton').classList.remove('activated');
   }
 
-  this.showMatchButton = function () {
+  this.showMatchButton = function (matchAmountPercent) {
     document.getElementById('matchButton').classList.remove('disabled', 'activated');
     document.getElementById('actionButtons').classList.add('match-phase');
+    document.getElementById('betButton').classList.add('disabled');
+    document.getElementById('match-overlay').style.height = matchAmountPercent + "%";
   }
 
   this.animateMatchTimerBar = function () {
@@ -134,6 +146,10 @@ var Painter = new function () {
     var el = document.getElementById('spellshot' + pNum);
     el.classList.add('inflight');
     el.classList.add('target' + targNum);
+  }
+
+  this.animateMatch = function (pNum) {
+    
   }
 
   this.destructParticles = function (pNum, loss) {
@@ -223,16 +239,16 @@ var Painter = new function () {
     document.getElementById('healthReadout').innerHTML = readout;
   }
 
-  this.zeroBetOverlay = function () {
-    document.getElementById('bet-count-overlay').className = "";
-    // document.getElementById('defend-overlay').className = "";
-    // document.getElementById('match-overlay').className = "";
-
+  this.stageStartEnableButtons = function () {
     var btnEls = ['foldButton', 'matchButton', 'betButton']
     for (var i = 0; i < btnEls.length; i++) {
       document.getElementById(btnEls[i]).classList.remove('disabled', 'activated');
     }
-    
+  }
+
+  this.zeroBetOverlay = function () {
+    document.getElementById('bet-count-overlay').className = "";
+    document.getElementById('match-overlay').style.height = "0%";
   }
 
   function revealElements(nums, cards) {

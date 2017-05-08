@@ -55,5 +55,6 @@ Fri 5-5 (Day 18) 11:53-1:53 (2h00m)
 Sat 5-6 (Day 19) 6:14p-7:24p (1h10m)
   timing control and linting
 
-Sun 5-7 (Day 20) 8:40p-
+Sun 5-7 (Day 20) 8:40p-9:32 (0h52m)
   move images to folder
+  improve button behavior
