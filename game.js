@@ -103,17 +103,11 @@ var Game = new function () {
     fold(1);
   }
 
-  this.pressMatch = function () {
-    if (game.inputPhase == "match") {
-      meet(1);
-    } else if (game.inputPhase == "bet") {
-      check(1);
-    }
-  };
-
   this.pressBet = function () {
     if (game.inputPhase == "bet") {
       bet(1);
+    } else if (game.inputPhase == "match") {
+      meet(1);
     }
   }
 
@@ -618,10 +612,6 @@ var Game = new function () {
       return 0;
     }
 
-    if (game.render) {
-      game.painter.animateMeet(pNum);
-    }
-
     var amount = diff;
     if (player.motes.length < amount) {
       amount = player.motes.length;
@@ -630,14 +620,18 @@ var Game = new function () {
     player.wager += amount;
     sendMotesToWarp(pNum, amount);
     var betCount = (player.motes.length == 0 ? 7 : 0)
+
     if (game.render) {
+      if (pNum == 1 && player.motes.length > 0) {
+        // animateMeet draws the button change
+        game.painter.animateMeet(pNum);
+      }
+      // animateBet draws the bet button overlay size change
       game.painter.animateBet(pNum, betCount, amount);
     }
 
-    // console.log(player.name + " calls " + amount + " @meet with " + player.motes.length + " remaining.");
-
     if (player.motes.length == 0) {
-      // console.log("set " + pNum + " " + game.players[pNum].name  + " all-in @meet.")
+      // setAllIn will render its own button state change
       setAllIn(pNum);
       checkForCapture();
     }
@@ -957,7 +951,7 @@ var Game = new function () {
     if (game.render) {
       game.painter.animateBetTimerBar();
       game.painter.resetMaxMarked();
-      game.painter.showCheckButton();
+      game.painter.showBetButton(game.players[1].allIn);
     }
 
     game.maxWager = 0;
@@ -1024,14 +1018,7 @@ var Game = new function () {
 
     if (game.render) {
       game.painter.animateMatchTimerBar();
-
-      var matchAmountPercent = 100 * game.maxWager / game.roundStartMana[1];
-      if (matchAmountPercent > 100) {
-        matchAmountPercent = 100;
-      }
-      if (!(game.players[1].folded || game.players[1].allIn)) {
-        game.painter.showMatchButton(matchAmountPercent);
-      }
+      game.painter.showMatchButton(game.players[1].allIn);
     }
 
     triggerByClock(endMatchStage, game.clock.matchStage);

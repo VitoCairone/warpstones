@@ -18,7 +18,6 @@
 
   <SCRIPT>
     pressFold = new function () {};
-    pressMatch = new function () {};
     pressBet = new function () {};
     pressSpellLock = new function () {};
     pressContinue = new function () {};
@@ -155,21 +154,10 @@
         <div id="foldButton" class="action-button fold-button" onclick="pressFold()">
           <!-- <div id="defend-overlay">
           </div> -->
-          <div class="center-text">
+          <div id="fold-text" class="center-text">
             DEFEND
           </div>
         </div>
-
-        <div id="matchButton" class="action-button match-button" onclick="pressMatch()">
-          <div id="match-overlay">
-          </div>
-          <div id="match-text" class="center-text">
-            MATCH
-          </div>
-          <div id="check-text" class="center-text">
-            CHECK
-          </div>
-        </div>        
 
         <div id="betButton" class="action-button bet-button" onclick="pressBet()">
           <div id="bet-count-overlay">
@@ -295,7 +283,6 @@
     })();
 
     pressFold = Game.pressFold;
-    pressMatch = Game.pressMatch;
     pressBet = Game.pressBet;
     pressSpellLock = Game.pressSpellLock;
     pressContinue = Game.pressContinue;

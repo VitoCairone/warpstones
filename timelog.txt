@@ -59,5 +59,10 @@ Sun 5-7 (Day 20) 8:40p-9:35 (55m)
   move images to folder
   improve button style behavior
 
-Mon 5-8 (Day 21) 11:15-11:27 (27m)
+Mon 5-8 (Day 21) 11:15-11:30 (15m)
   set all-in text and disable buttons on all-in
+
+** week 3 total: 5h56m
+
+Tue 5-9 (Day 22) 10:07a-
+  
