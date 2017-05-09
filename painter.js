@@ -76,14 +76,15 @@ var Painter = new function () {
   this.showBetButton = function (isAllIn) {
     document.getElementById('actionButtons').classList.remove('match-phase');
     if (!isAllIn) {
-      document.getElementById('bet-text').innerHTML == 'BET';
+      console.log("!!!");
+      document.getElementById('bet-text').innerHTML = 'BET';
     }
   }
 
   this.showMatchButton = function (isAllIn, matchAmountPercent) {
     document.getElementById('actionButtons').classList.add('match-phase');
     if (!isAllIn) {
-      document.getElementById('bet-text').innerHTML == 'MATCH';
+      document.getElementById('bet-text').innerHTML = 'MATCH';
     } 
   }
 
