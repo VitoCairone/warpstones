@@ -4,12 +4,12 @@ var Painter = new function () {
 
   this.animateAllIn = function (pNum) {
     if (pNum == 1) {
-      document.getElementById('foldButton').classList.add('disabled');
-      // document.getElementById('matchButton').classList.add('disabled');
 
-      // make sure bet button is activated, even if got here by meet,
-      // because meet button will be deactivated...
-      // document.getElementById('betButton').classList.add('activated');
+      document.getElementById('foldButton').classList.add('disabled');
+      document.getElementById('matchButton').classList.add('disabled');
+
+      document.getElementById('betButton').classList.add('activated');
+      document.getElementById('bet-text').innerHTML = 'ALL IN';
     }
   }
 
@@ -249,6 +249,7 @@ var Painter = new function () {
   this.zeroBetOverlay = function () {
     document.getElementById('bet-count-overlay').className = "";
     document.getElementById('match-overlay').style.height = "0%";
+    document.getElementById('bet-text').innerHTML = 'BET';
   }
 
   function revealElements(nums, cards) {
