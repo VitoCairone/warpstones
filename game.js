@@ -25,7 +25,7 @@ var Game = new function () {
       betStage: 3500,
       transitionPhase: 200,
       matchStage: 1500,
-      spellLocking: 2000,
+      spellLocking: 200,
       spellCasting: 2000,
       manaMove: 0,
       manaSpend: 0,
