@@ -76,15 +76,19 @@ var Painter = new function () {
   this.showBetButton = function (isAllIn) {
     document.getElementById('actionButtons').classList.remove('match-phase');
     if (!isAllIn) {
-      console.log("!!!");
-      document.getElementById('bet-text').innerHTML = 'BET';
+      document.getElementById('bet-text').innerHTML = "BET";
     }
   }
 
-  this.showMatchButton = function (isAllIn, matchAmountPercent) {
+  this.showMatchButton = function (isMatched, isAllIn, matchAmountPercent) {
     document.getElementById('actionButtons').classList.add('match-phase');
     if (!isAllIn) {
-      document.getElementById('bet-text').innerHTML = 'MATCH';
+      if (isMatched) {
+        document.getElementById('bet-text').innerHTML = "MATCHED";
+      } else {
+        document.getElementById('bet-text').innerHTML = "MATCH";
+        document.getElementById('match-overlay').style.height = matchAmountPercent + '%';
+      }
     } 
   }
 
@@ -92,9 +96,10 @@ var Painter = new function () {
     document.getElementById('progress-bar-fill').classList.add('match-stage');
   }
 
-  this.animateBet = function (pNum, betCount, betSize) {
-    if (pNum == 1 && betCount > 0) {
-      document.getElementById('bet-count-overlay').classList.add('count-' + betCount);
+  this.animateBet = function (pNum, newWagerPercent, betSize) {
+    if (pNum == 1 && newWagerPercent > 0) {
+       document.getElementById('bet-count-overlay').style.height = newWagerPercent + "%";
+      // document.getElementById('bet-count-overlay').classList.add('count-' + betCount);
     }
     Magnetic.hiliteMagnetParticles(pNum, betSize);
   }
@@ -240,7 +245,9 @@ var Painter = new function () {
   }
 
   this.zeroBetOverlay = function () {
-    document.getElementById('bet-count-overlay').className = "";
+    // document.getElementById('bet-count-overlay').className = "";
+    document.getElementById('bet-count-overlay').style.height = "0%";
+    document.getElementById('match-overlay').style.height = "0%";
     // document.getElementById('bet-text').innerHTML = 'BET';
   }
 

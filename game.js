@@ -167,7 +167,7 @@ var Game = new function () {
       betSize = game.forceEndBetSize;
     }
 
-    // seventh bet should generally be all-in
+    // seventh bet should be all-in
     if ((player.betCount + 1 >= 7) && (player.motes.length <= game.forceEndBetSize)) {
       betSize = player.motes.length;
     }
@@ -193,7 +193,8 @@ var Game = new function () {
     }
 
     if (game.render) {
-      game.painter.animateBet(pNum, player.betCount, betSize);
+      var newWagerPercent = 100 * player.wager / game.roundStartMana[pNum];
+      game.painter.animateBet(pNum, newWagerPercent, betSize);
     }
 
     return 1;
@@ -619,15 +620,16 @@ var Game = new function () {
 
     player.wager += amount;
     sendMotesToWarp(pNum, amount);
-    var betCount = (player.motes.length == 0 ? 7 : 0)
 
     if (game.render) {
       if (pNum == 1 && player.motes.length > 0) {
         // animateMeet draws the button change
         game.painter.animateMeet(pNum);
       }
+
       // animateBet draws the bet button overlay size change
-      game.painter.animateBet(pNum, betCount, amount);
+      var newWagerPercent = 100 * player.wager / game.roundStartMana[pNum];
+      game.painter.animateBet(pNum, newWagerPercent, amount);
     }
 
     if (player.motes.length == 0) {
@@ -1018,7 +1020,16 @@ var Game = new function () {
 
     if (game.render) {
       game.painter.animateMatchTimerBar();
-      game.painter.showMatchButton(game.players[1].allIn);
+
+      var matchAmountPercent = 100 * game.maxWager / game.roundStartMana[1];
+      if (matchAmountPercent > 100) {
+        matchAmountPercent = 100;
+      }
+      game.painter.showMatchButton(
+        (game.players[1].wager == maxWager),
+        game.players[1].allIn,
+        matchAmountPercent
+      );
     }
 
     triggerByClock(endMatchStage, game.clock.matchStage);

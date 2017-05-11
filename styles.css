@@ -38,11 +38,11 @@ body {
 
 .action-button {
   position: absolute;
-  top: 38px;
+  top: 48px;
   border-radius: 13%; 
   border: 2px solid blue;
   height: 64px; 
-  width: 30%;
+  width: 35%;
   margin: 0;
   background-color: navy;
 }
@@ -63,15 +63,11 @@ actual sizing seems off probably because of the borders
 */
 
 .fold-button {
-  left: 1.75%;
-}
-
-.match-button {
-  left: 35%;
+  left: 10%;
 }
 
 .bet-button {
-  left: 68.25%;
+  left: 55%;
 }
 
 /*.action-button:active {
@@ -119,7 +115,7 @@ actual sizing seems off probably because of the borders
 
 #match-overlay {
   position: absolute;
-  background-color: mediumblue;
+  background-color: orange;
   height: 0%;
   width: 100%;
   bottom: 0px;
@@ -152,38 +148,10 @@ actual sizing seems off probably because of the borders
   background-color: silver;
 }
 
-#bet-count-overlay.count-1 {
-  height: 14.2%;
-}
-
-#bet-count-overlay.count-2 {
-  height: 28.5%;
-}
-
-#bet-count-overlay.count-3 {
-  height: 42.8%;
-}
-
-#bet-count-overlay.count-4 {
-  height: 57.1%;
-}
-
-#bet-count-overlay.count-5 {
-  height: 71.4%;
-}
-
-#bet-count-overlay.count-6 {
-  height: 85.7%;
-}
-
-#bet-count-overlay.count-7 {
-  height: 100%;
-}
-
 .spell-button {
   position: absolute;
   border-radius: 13%;
-  top: 120px;
+  top: 135px;
   height: 60px;
   width: 20%;
   margin: 0;
