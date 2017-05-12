@@ -67,5 +67,8 @@ Mon 5-8 (Day 21) 11:15-11:30 (15m)
 Tue 5-9 (Day 22) 10:07a-10:42a (35m)
   build some two-button behaviors
 
-Wed 5-10 (Day 23) 10:47p-
+Wed 5-10 (Day 23) 10:47p-11:34p (47m)
   move all match button behaviors to bet button
+  make text unselectable
+  push to github.io
+
