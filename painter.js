@@ -164,7 +164,7 @@ var Painter = new function () {
       'air-orb',
       'ice-orb',
       'void-orb',
-      'gold-orb'
+      'spirit-orb'
     ]
 
     // clearing any -orb class from every card-el element,

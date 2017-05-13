@@ -258,7 +258,7 @@ actual sizing seems off probably because of the borders
   border: 2px solid silver;
 }
 
-.gold-orb {
+.spirit-orb {
   /*display: inline-block; */
   border-radius: 50%; 
   background-color: gold; 

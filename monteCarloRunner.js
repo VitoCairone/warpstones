@@ -9,7 +9,7 @@ for (var i = 0; i < 7; i++) {
   cards = cards.concat(elements);
 }
 
-cards = cards.concat(['void', 'void', 'gold']);
+cards = cards.concat(['void', 'void', 'spirit']);
 
 function gestaltRank(gestalt) {
   var score = 0;
@@ -39,7 +39,7 @@ function gestaltRank(gestalt) {
     pow10 *= 10;
   }
 
-  if ('gold' in hashEls) {
+  if ('spirit' in hashEls) {
     score += 1;
   }
 

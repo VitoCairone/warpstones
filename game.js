@@ -94,7 +94,7 @@ var Game = new function () {
     for (var i = 0; i < 7; i++) {
       game.cards = game.cards.concat(game.elements);
     }
-    game.cards = game.cards.concat(["void", "void", "gold"]);
+    game.cards = game.cards.concat(["void", "void", "spirit"]);
 
     reset();
   };
@@ -586,8 +586,6 @@ var Game = new function () {
         innerForm.push(el.charAt(0) + hashEls[el]);
       }
       formula = innerForm.join(' ');
-      
-      console.log("FORMULA: " + formula);
     }
 
     countsArr = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -603,7 +601,7 @@ var Game = new function () {
       pow10 *= 10;
     }
 
-    if ("gold" in hashEls) {
+    if ("spirit" in hashEls) {
       score += 1;
       formula = formula + " +S"
     }
