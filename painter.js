@@ -237,6 +237,11 @@ var Painter = new function () {
     document.getElementById('healthReadout').innerHTML = readout;
   }
 
+  this.setSpellButtonText = function (num, text) {
+    var el = document.getElementById('spell-text-' + num);
+    el.innerHTML = text;
+  }
+
   this.stageStartEnableButtons = function () {
     var btnEls = ['foldButton', 'betButton']
     for (var i = 0; i < btnEls.length; i++) {

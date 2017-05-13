@@ -640,22 +640,34 @@ var Game = new function () {
     var spellParts = [];
     switch (formula.charAt(0)) {
       case 'e': spellParts = ["Rock"];
+      break;
 
       case 'f': spellParts = ["Fire"];
+      break;
 
       case 'a': spellParts = ["Bolt"];
+      break;
 
       case 'w': spellParts = ["Water"];
+      break;
 
       case 'i': spellParts = ["Ice"];
+      break;
 
       case 'l': spellParts = ["Cure"];
+      break;
 
       case 'd': spellParts = ["Drain"];
+      break;
 
       case 'x': spellParts = ["Blast"];
+      break;
 
       case '0': spellParts = ["Void"];
+      break;
+
+      default:
+      alert('Error: unexpected formula ' + formula)
 
     }
     return spellParts.join(" ");
@@ -844,6 +856,39 @@ var Game = new function () {
 
     if (game.render) {
       game.painter.animateAllIn(pNum);
+    }
+  }
+
+  function setGestaltRanks() {
+    for (var i = 1; i <= 8; i++) {
+      // skip folded players because they are never eligible,
+      // even for side pots
+      if (game.players[i].folded) {
+        continue;
+      }
+      var player = game.players[i];
+      var gestalt = getCommonCards().concat(getPlayerCards(i));
+      var gestalted = calcGestaltData(gestalt);
+      var score = gestalted.score;
+
+      player.gestalt = gestalt;
+      player.gestaltRank = gestalted.score;
+      player.gestaltFormula = gestalted.formula;
+
+      var shortHand = [];
+      for (var j = 0; j < gestalt.length; j++) {
+        shortHand.push(gestalt[j].charAt(0).toUpperCase())
+      }
+      // console.log(player.name + ' has ' + shortHand.join('') + ' worth ' + score);
+      // game.players[i].score = score;
+    }
+  }
+
+  function setWarpSpell(pNum) {
+    var player = game.players[pNum];
+    player.warpSpell = getSpellForFormula(player.gestaltFormula);
+    if (pNum == 1 && game.render) {
+      game.painter.setSpellButtonText(4, player.warpSpell);
     }
   }
 
@@ -1252,39 +1297,19 @@ var Game = new function () {
 
   function startSpellLocking() {
     var winners = game.winners;
+    // var p1CanCast = false;
     for (var i = 0; i < winners.length; i++) {
-      var pNum = winners[i];
-      console.log("Formula: " + game.players[pNum].gestaltFormula);
+      setWarpSpell(winners[i]);
+      // var pNum = winners[i];
+      // if (pNum == 1) {
+      //   p1CanCast = true;
+      // }
+      // console.log("Formula: " + game.players[pNum].gestaltFormula);
     }
   }
 
   function startSpellCasting() {
     botSpellCasting();
-  }
-
-  function setGestaltRanks() {
-    for (var i = 1; i <= 8; i++) {
-      // skip folded players because they are never eligible,
-      // even for side pots
-      if (game.players[i].folded) {
-        continue;
-      }
-      var player = game.players[i];
-      var gestalt = getCommonCards().concat(getPlayerCards(i));
-      var gestalted = calcGestaltData(gestalt);
-      var score = gestalted.score;
-
-      player.gestalt = gestalt;
-      player.gestaltRank = gestalted.score;
-      player.gestaltFormula = gestalted.formula;
-
-      var shortHand = [];
-      for (var j = 0; j < gestalt.length; j++) {
-        shortHand.push(gestalt[j].charAt(0).toUpperCase())
-      }
-      // console.log(player.name + ' has ' + shortHand.join('') + ' worth ' + score);
-      // game.players[i].score = score;
-    }
   }
 
   function teamOneBias(pNum) {
