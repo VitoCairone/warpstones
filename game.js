@@ -209,6 +209,75 @@ var Game = new function () {
     });
   }
 
+  function calcGestaltData(gestalt, findFormula) {
+    if (typeof findFormula === 'undefined') {
+      findFormula = true;
+    }
+
+    var score = 0;
+    var formula = "";
+    var hashEls = {};
+
+    for (var i = 0; i < gestalt.length; i++) {
+      var el = gestalt[i];
+      if (el in hashEls) {
+        hashEls[el] += 1;
+      } else {
+        hashEls[el] = 1;
+      }
+    }
+
+    var presentEls = Object.keys(hashEls);
+
+    presentEls.sort(function (a, b) {
+      return hashEls[b] - hashEls[a];
+    })
+
+    if (findFormula) {
+      var innerForm = [];
+      for (var i = 0; i < presentEls.length; i++) {
+        var el = presentEls[i];
+        if (hashEls[el] < 2) {
+          break;
+        }
+        innerForm.push(el.charAt(0) + hashEls[el]);
+      }
+      if (innerForm.length == 0) {
+        formula = 'x';
+      } else {
+        formula = innerForm.join(' ');
+      }
+    }
+
+    countsArr = [0, 0, 0, 0, 0, 0, 0, 0];
+    for (var i = 0; i < presentEls.length; i++) {
+      var el = presentEls[i];
+      countsArr[hashEls[el]] += 1;
+    }
+
+    var pow10 = 1;
+    for (var i = 1; i <= 7; i++) {
+      var multiple = countsArr[i];
+      score += multiple * pow10;
+      pow10 *= 10;
+    }
+
+    if ("spirit" in hashEls) {
+      score += 1;
+      formula = formula + " +S"
+    }
+
+    if ("void" in hashEls && hashEls["void"] == 2) {
+      formula = "0 " + formula;
+      score += 1000000000;
+    }
+
+    return {
+      formula: formula,
+      score: score
+    };
+  }
+
   function canPlayerOneAct() {
     return (!game.players[1].allIn && !game.players[1].folded);
   }
@@ -552,71 +621,6 @@ var Game = new function () {
     return game.teamOneWinRecord[0] + game.teamOneWinRecord[1];
   }
 
-  function calcGestaltData(gestalt, findFormula) {
-    if (typeof findFormula === 'undefined') {
-      findFormula = true;
-    }
-
-    var score = 0;
-    var formula = "";
-    var hashEls = {};
-
-    for (var i = 0; i < gestalt.length; i++) {
-      var el = gestalt[i];
-      if (el in hashEls) {
-        hashEls[el] += 1;
-      } else {
-        hashEls[el] = 1;
-      }
-    }
-
-    var presentEls = Object.keys(hashEls);
-
-    presentEls.sort(function (a, b) {
-      return hashEls[b] - hashEls[a];
-    })
-
-    if (findFormula) {
-      var innerForm = [];
-      for (var i = 0; i < presentEls.length; i++) {
-        var el = presentEls[i];
-        if (hashEls[el] < 2) {
-          break;
-        }
-        innerForm.push(el.charAt(0) + hashEls[el]);
-      }
-      formula = innerForm.join(' ');
-    }
-
-    countsArr = [0, 0, 0, 0, 0, 0, 0, 0];
-    for (var i = 0; i < presentEls.length; i++) {
-      var el = presentEls[i];
-      countsArr[hashEls[el]] += 1;
-    }
-
-    var pow10 = 1;
-    for (var i = 1; i <= 7; i++) {
-      var multiple = countsArr[i];
-      score += multiple * pow10;
-      pow10 *= 10;
-    }
-
-    if ("spirit" in hashEls) {
-      score += 1;
-      formula = formula + " +S"
-    }
-
-    if ("void" in hashEls && hashEls["void"] == 2) {
-      formula = "0 " + formula;
-      score += 1000000000;
-    }
-
-    return {
-      formula: formula,
-      score: score
-    };
-  }
-
   function getCommonCards() {
     return game.cards.slice(16, 21);
   }
@@ -628,6 +632,33 @@ var Game = new function () {
 
   function getPlayerStat(player, stat) {
     return 0;
+  }
+
+  function getSpellForFormula(formula) {
+
+    // quick and dirty method only returns 
+    var spellParts = [];
+    switch (formula.charAt(0)) {
+      case 'e': spellParts = ["Rock"];
+
+      case 'f': spellParts = ["Fire"];
+
+      case 'a': spellParts = ["Bolt"];
+
+      case 'w': spellParts = ["Water"];
+
+      case 'i': spellParts = ["Ice"];
+
+      case 'l': spellParts = ["Cure"];
+
+      case 'd': spellParts = ["Drain"];
+
+      case 'x': spellParts = ["Blast"];
+
+      case '0': spellParts = ["Void"];
+
+    }
+    return spellParts.join(" ");
   }
 
   function meet(pNum) {
@@ -853,7 +884,14 @@ var Game = new function () {
   function showdown() {
 
     var completeShowdown = function () {
+
+      // this ordering is a bit off. Instead calculate winnings first,
+      // and send mana to winners using that info shortly
+      // after.
+
       var winnings = sendManaToWinners();
+
+
       if (game.render) {
         game.painter.animateSendWinnings(winnings);
       }
@@ -1213,7 +1251,11 @@ var Game = new function () {
   }
 
   function startSpellLocking() {
-    ;
+    var winners = game.winners;
+    for (var i = 0; i < winners.length; i++) {
+      var pNum = winners[i];
+      console.log("Formula: " + game.players[pNum].gestaltFormula);
+    }
   }
 
   function startSpellCasting() {
@@ -1233,7 +1275,8 @@ var Game = new function () {
       var score = gestalted.score;
 
       player.gestalt = gestalt;
-      player.gestaltRank = score;
+      player.gestaltRank = gestalted.score;
+      player.gestaltFormula = gestalted.formula;
 
       var shortHand = [];
       for (var j = 0; j < gestalt.length; j++) {
