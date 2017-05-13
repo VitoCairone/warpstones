@@ -72,7 +72,7 @@ var Game = new function () {
     motesPerRound: 7,
     render: true,
     painter: null,
-    clock: clocks.normal,
+    clock: clocks.fast,
     newAllIns: [],
     sidePots: [],
     baseDamageMod: 5.5,
@@ -552,11 +552,14 @@ var Game = new function () {
     return game.teamOneWinRecord[0] + game.teamOneWinRecord[1];
   }
 
-  function gestaltRank(gestalt) {
+  function calcGestaltData(gestalt, findFormula) {
+    if (typeof findFormula === 'undefined') {
+      findFormula = true;
+    }
 
     var score = 0;
+    var formula = "";
     var hashEls = {};
-    var presentEls = [];
 
     for (var i = 0; i < gestalt.length; i++) {
       var el = gestalt[i];
@@ -564,8 +567,27 @@ var Game = new function () {
         hashEls[el] += 1;
       } else {
         hashEls[el] = 1;
-        presentEls.push(el);
       }
+    }
+
+    var presentEls = Object.keys(hashEls);
+
+    presentEls.sort(function (a, b) {
+      return hashEls[b] - hashEls[a];
+    })
+
+    if (findFormula) {
+      var innerForm = [];
+      for (var i = 0; i < presentEls.length; i++) {
+        var el = presentEls[i];
+        if (hashEls[el] < 2) {
+          break;
+        }
+        innerForm.push(el.charAt(0) + hashEls[el]);
+      }
+      formula = innerForm.join(' ');
+      
+      console.log("FORMULA: " + formula);
     }
 
     countsArr = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -583,13 +605,18 @@ var Game = new function () {
 
     if ("gold" in hashEls) {
       score += 1;
+      formula = formula + " +S"
     }
 
     if ("void" in hashEls && hashEls["void"] == 2) {
+      formula = "0 " + formula;
       score += 1000000000;
     }
 
-    return score;
+    return {
+      formula: formula,
+      score: score
+    };
   }
 
   function getCommonCards() {
@@ -1204,7 +1231,8 @@ var Game = new function () {
       }
       var player = game.players[i];
       var gestalt = getCommonCards().concat(getPlayerCards(i));
-      var score = gestaltRank(gestalt);
+      var gestalted = calcGestaltData(gestalt);
+      var score = gestalted.score;
 
       player.gestalt = gestalt;
       player.gestaltRank = score;

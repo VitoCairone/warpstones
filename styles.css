@@ -170,19 +170,19 @@ actual sizing seems off probably because of the borders
   border: 2px solid blue;
 }
 
-#signature-spell-button {
+#spell-button-1 {
   left: 2.5%;
 }
 
-#special-spell-button {
+#spell-button-2 {
   left: 27.5%;
 }
 
-#warp-spell-button {
+#spell-button-3 {
   left: 52.5%;
 }
 
-#ultimate-spell-button {
+#spell-button-4 {
   left: 77.5%;
 }
 

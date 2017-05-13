@@ -72,3 +72,8 @@ Wed 5-10 (Day 23) 10:47p-11:34p (47m)
   make text unselectable
   push to github.io
 
+Thu 5-11 (Day 24) 11:48p (01m)
+  touch to unco buttons only
+
+Fri 5-12 (Day 25) 10:42-
+  find spell formulas
