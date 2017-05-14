@@ -83,3 +83,4 @@ Sat 5-13 (Day 26) 12:40-1:06 (26m)
   show spell on 4th button
 
 Sun 5-14 (Day 27) 2:50-
+  spell names appear on clickable button
