@@ -111,9 +111,8 @@ var Game = new function () {
     }
   }
 
-  this.pressSpellLock = function () {
-    alert("spell-lock");
-    // spellLock(1);
+  this.pressSpellLock = function (num) {
+    alert("spell-lock " + num);
   };
 
   this.pressContinue = function () {
@@ -673,6 +672,25 @@ var Game = new function () {
     return spellParts.join(" ");
   }
 
+  function grantWarpSpell(pNum) {
+    var player = game.players[pNum];
+
+    var newSpell = getSpellForFormula(player.gestaltFormula);
+
+    if (player.spells.indexOf(newSpell) === -1) {
+      while (player.spells.length > 3) {
+        player.spells.shift();
+      }
+      player.spells.push(newSpell);
+    }
+
+    if (pNum == 1 && game.render) {
+      for (var i = 1; i <= 4; i++) {
+        game.painter.setSpellButtonText(i, player.spells[i - 1]);
+      }
+    }
+  }
+
   function meet(pNum) {
     var player = game.players[pNum];
     var diff = game.maxWager - player.wager;
@@ -734,7 +752,7 @@ var Game = new function () {
   }
 
   function report(code, msg) {
-    console.log(msg);
+    ; // console.log(msg);
   }
 
   function reset() {
@@ -757,6 +775,7 @@ var Game = new function () {
         allIn: false,
         ghost: false,
         motes: [],
+        spells: [null, null, null],
         wager: 0
       }
       for (var j = 0; j < (game.startMotes - game.motesPerRound); j++) {
@@ -881,14 +900,6 @@ var Game = new function () {
       }
       // console.log(player.name + ' has ' + shortHand.join('') + ' worth ' + score);
       // game.players[i].score = score;
-    }
-  }
-
-  function setWarpSpell(pNum) {
-    var player = game.players[pNum];
-    player.warpSpell = getSpellForFormula(player.gestaltFormula);
-    if (pNum == 1 && game.render) {
-      game.painter.setSpellButtonText(4, player.warpSpell);
     }
   }
 
@@ -1299,7 +1310,7 @@ var Game = new function () {
     var winners = game.winners;
     // var p1CanCast = false;
     for (var i = 0; i < winners.length; i++) {
-      setWarpSpell(winners[i]);
+      grantWarpSpell(winners[i]);
       // var pNum = winners[i];
       // if (pNum == 1) {
       //   p1CanCast = true;
