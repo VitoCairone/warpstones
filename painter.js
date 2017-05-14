@@ -154,6 +154,20 @@ var Painter = new function () {
     Magnetic.destructParticles(pNum, loss);
   }
 
+  this.disableSpellButtons = function () {
+    var els = document.getElementsByClassName("spell-button");
+    for (var i = 0; i < els.length; i++) {
+      els[i].classList.add('disabled');
+    }
+  }
+
+  this.enableSpellButtons = function () {
+    var els = document.getElementsByClassName("spell-button");
+    for (var i = 0; i < els.length; i++) {
+      els[i].classList.remove('disabled');
+    }
+  }
+
   this.hideAllCards = function () {
     var orbClasses = [
       'light-orb',

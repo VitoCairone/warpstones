@@ -89,17 +89,17 @@ actual sizing seems off probably because of the borders
 .center-text {
   position: absolute; 
   left: 0; 
-  top: 14px; 
+  top: 18px; 
   width: 100%; 
   text-align: center; 
-  font-size: 32px;
+  font-size: 23px;
   color: white;
   text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 }
 
-.action-button.disabled .center-text {
+.disabled .center-text {
   color: darkred;
-  font-size: 33px;
+  font-size: 24px;
   text-shadow: none;
 }
 
@@ -170,6 +170,10 @@ actual sizing seems off probably because of the borders
   background-color: navy;
   border: 2px solid blue;
   cursor: pointer;
+}
+
+.spell-button.disabled {
+  background-color: gray;
 }
 
 #spell-button-1 {

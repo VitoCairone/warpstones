@@ -112,7 +112,9 @@ var Game = new function () {
   }
 
   this.pressSpellLock = function (num) {
-    alert("spell-lock " + num);
+    if (game.inputPhase == "spell") {
+      alert("spell-lock " + num);
+    }
   };
 
   this.pressContinue = function () {
@@ -537,6 +539,9 @@ var Game = new function () {
   }
 
   function endSpellLocking() {
+    if (game.render) {
+      game.painter.disableSpellButtons();
+    }
     advanceStage();
   }
 
@@ -667,7 +672,11 @@ var Game = new function () {
 
       default:
       alert('Error: unexpected formula ' + formula)
+    }
 
+    if (formula.length > 1 && formula.charAt(1) > '3') {
+      var twoLess = parseInt(formula.charAt(1)) - 2;
+      spellParts.push(twoLess.toString());
     }
     return spellParts.join(" ");
   }
@@ -1307,6 +1316,10 @@ var Game = new function () {
   }
 
   function startSpellLocking() {
+    if (game.render) {
+      game.painter.enableSpellButtons();
+    }
+    game.inputPhase = "spell";
     var winners = game.winners;
     // var p1CanCast = false;
     for (var i = 0; i < winners.length; i++) {
