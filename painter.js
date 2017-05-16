@@ -42,6 +42,10 @@ var Painter = new function () {
     Magnetic.distributeParticles(winnings);
   }
 
+  this.animateSpellLock = function (num) {
+    document.getElementById('spell-button-' + num).classList.add('activated');
+  }
+
   this.animateTransitionPhase = function () {
     ;
   }

@@ -8,34 +8,39 @@ var SpellBook = {
   'Rock': {
     cost: 30,
     damage: 150
-    selfStatMods: { power: +25, aim: -25 }
-    selfStatModOn: 'cast'
-    selfStatModFor: 'spell'
+    spellStatMods: { power: +25, aim: -25 }
+    costGrowth: { 'linear': 18 }
   },
   'Ice': {
     cost: 20,
     damage: 110
+    costGrowth: { 'exponential': 4/3 }
   }, 
   'Fire': {
     cost: 25,
     damage: 135
+    costGrowth: {'exponential': 4/3}
   },
   'Bolt': {
     cost: 40,
     damage: 220
+    costGrowth: {'linear': 20}
   },
   'Water': {
     cost: 16,
-    damage: 80
+    damage: 80,
+    costGrowth: {'linear': 14}
   },
   'Cure': {
     cost: 21,
+    costGrowth: {'linear': 14}
     heal: 100,
     target: 'ally',
     targetPriority: 'lowestHP'
   },
   'Drain': {
     cost: 25,
+    costGrowth: {'linear': 16}
     damage: 50,
     healSelfBy: 'damage'
   },

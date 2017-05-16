@@ -113,7 +113,8 @@ var Game = new function () {
 
   this.pressSpellLock = function (num) {
     if (game.inputPhase == "spell") {
-      alert("spell-lock " + num);
+      game.painter.animateSpellLock(num);
+      spellLock(1, num);
     }
   };
 
@@ -395,6 +396,10 @@ var Game = new function () {
     return count;
   }
 
+  function defaultSpells() {
+    
+  }
+
   function detectWinCondition() {
     var teamOneAlive = false;
     var teamTwoAlive = false;
@@ -542,6 +547,7 @@ var Game = new function () {
     if (game.render) {
       game.painter.disableSpellButtons();
     }
+    defaultSpells();
     advanceStage();
   }
 
@@ -1038,6 +1044,10 @@ var Game = new function () {
     } else if (spellName == "Force Blast") {
       thisSpellStrike();
     }
+  }
+
+  function spellLock() {
+    ; // left off here 1053
   }
 
   function spellStrike(pNum, targNum, spellName, moteSpend) {
