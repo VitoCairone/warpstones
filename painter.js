@@ -161,6 +161,7 @@ var Painter = new function () {
   this.disableSpellButtons = function () {
     var els = document.getElementsByClassName("spell-button");
     for (var i = 0; i < els.length; i++) {
+      els[i].classList.remove('activated');
       els[i].classList.add('disabled');
     }
   }

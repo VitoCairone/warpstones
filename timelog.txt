@@ -85,3 +85,11 @@ Sat 5-13 (Day 26) 12:40-1:06 (26m)
 Sun 5-14 (Day 27) 2:50-3:44 (54m), ~2:30-5:57 (27m)
   spell names appear on clickable button
   varying spell names go through queue
+
+Mon 5-15 (Day 28) 10:48-10:53 (5m)
+  pressSpellLock function
+
+** week 4 total: 4h19m (boo!)
+
+Tue 5-16 (Day 19) 11:05-
+
