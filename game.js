@@ -397,7 +397,15 @@ var Game = new function () {
   }
 
   function defaultSpells() {
-    
+    for (var i = 1; i <= 8; i++) {
+      var player = game.players[i];
+      // by default cast the warp spell, which is the
+      // last of the player's spells
+      if (!player.spellLocked) {
+        player.spellToCast = player.spells.slice(-1)[0];
+        player.spellLocked = true;
+      }
+    }
   }
 
   function detectWinCondition() {
@@ -995,7 +1003,12 @@ var Game = new function () {
     var target = game.players[targNum];
 
     var moteSpend = 0;
-    var spellName = null;
+    var spellName = player.spellToCast;
+
+    if (typeof spellName !== 'string') {
+      alert('Error: for pNum ' + pNum + ' spellToCast is type ' + typeof spellName)
+      return;
+    }
 
     var reviveCost = 100;
 
@@ -1046,8 +1059,17 @@ var Game = new function () {
     }
   }
 
-  function spellLock() {
-    ; // left off here 1053
+  function spellLock(pNum, spellNum) {
+    var player = game.players[pNum];
+    var spellIdx = spellNum - 1;
+
+    if (spellIdx >= player.spellList.length) {
+      alert('error: player has no spell ' + spellNum);
+      return;
+    }
+
+    player.spellToCast = player.spells[spellNum];
+    player.spellLocked = true;
   }
 
   function spellStrike(pNum, targNum, spellName, moteSpend) {
@@ -1329,6 +1351,10 @@ var Game = new function () {
     if (game.render) {
       game.painter.enableSpellButtons();
     }
+    for (var i = 1; i <= 8; i++) {
+      game.players[i].spellLocked = false;
+    }
+
     game.inputPhase = "spell";
     var winners = game.winners;
     // var p1CanCast = false;
