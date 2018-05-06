@@ -133,9 +133,15 @@ var Painter = new function () {
     for (var i = 1; i <= 8; i++) {
       Magnetic.transferMarkedParticles(i, 0);
     }
+    // for (var i = 1; i <= 8; i++) {
+    //   var el = document.getElementById('sprite' + i);
+    //   el.classList.remove(el, 'raise');
+    // }
   }
 
   this.animateFold = function (pNum) {
+    // TEST ONLY, move from here
+    this.animateRaise(pNum);
     if (pNum == 1) {
       // document.getElementById('defend-overlay').classList.add('defend');
       document.getElementById('foldButton').classList.add('activated');
@@ -156,6 +162,11 @@ var Painter = new function () {
 
   this.destructParticles = function (pNum, loss) {
     Magnetic.destructParticles(pNum, loss);
+  }
+
+  this.animateRaise = function(pNum) {
+    var el = document.getElementById('sprite' + pNum);  
+    el.classList.add('raise');
   }
 
   this.disableSpellButtons = function () {
