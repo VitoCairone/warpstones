@@ -353,7 +353,7 @@ actual sizing seems off probably because of the borders
   /*border: 1px dashed orange;*/
   position: absolute;
   height: 31px;
-  width: 24px;
+  width: 40px;
   background: url('images/magikoopa_idle.png') left center;
   /*background-size: 30px 40px;*/
   background-position: 0px, 0px;
@@ -366,14 +366,13 @@ actual sizing seems off probably because of the borders
 }
 
 @keyframes wizidle {
-   from { background-position-x:  1px; }
-     to { background-position-x: -162px; }
+   from { background-position-x:  0px; }
+     to { background-position-x: -160px; }
 }
 
 .sprite.raise {
   background: url('images/magikoopa_raise.png') left center;
   animation: wizraise 0.7s steps(7);
-
   transition-property: background-position-x;
   transition-timing-function: linear;
   transition-duration: 700ms;

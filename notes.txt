@@ -1,0 +1,47 @@
+=== NOTES
+
+WIZARDS are referred to in this document as male
+however WIZARDS should be some male and others female,
+and any in-game text with pronouns (which is preferably avoided)
+MUST substitute the proper pronoun
+
+=== WORKFLOWS
+
+PLAYER WORKFLOW
+
+The PLAYER should arrive on the RULES
+
+(this is for development version -- by the final version,
+ EVERY rule should be sufficiently animated that the game
+ is both readily playable and readily graspable
+ by non-English-speakers)
+
+The RULES are one splash page overlay, which is clicked through
+
+During the match...
+
+=== SPRITE ANIMATIONS
+
+The WIZARD is normally idling (walking in place)
+
+IDLING indicates agency, that is, the ability to
+continue to match, bet, or defend.
+
+When DEFENDING, the WIZARD stops walking, but stays
+still in his neutral walking pose
+
+Upon RAISING, the WIZARD raises his staff and then
+	keeps it up until the next bet round starts;
+	any WIZARDS who are all-in keep their staves raised
+	(and thus, are also still, showing their fixed choice)
+
+During CHOOSING, the WIZARD raises his staff and then
+	keeps it up once his choice is made; shortly after
+	the last WIZARD chooses, or when the timer expires,
+	all spells are cast; WIZARDS who defaulted perform
+	a hastened upswing after the timer expires and then
+	immediately cast their default spell
+
+Upon CASTING, the WIZARD sweeps his staff to forwards
+and then keeps it forwards until all spells resolve
+at which point everyone returns to idle walking
