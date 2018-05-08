@@ -45,3 +45,12 @@ During CHOOSING, the WIZARD raises his staff and then
 Upon CASTING, the WIZARD sweeps his staff to forwards
 and then keeps it forwards until all spells resolve
 at which point everyone returns to idle walking
+
+
+At the end of the RIVER, the WARP expands (for CHOOSING)
+The WARP contracts slightly with each choosing, and then
+significantly (from 50% to 0% expanded) after the final choice
+
+
+
+

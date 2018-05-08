@@ -8,6 +8,8 @@ var Painter = new function () {
       document.getElementById('betButton').classList.add('activated');
       document.getElementById('bet-text').innerHTML = 'ALL IN';
     }
+    var el = document.getElementById('sprite' + pNum);
+    el.classList.add('raise');
   }
 
   this.animateDamage = function (pNum, amount) {
@@ -59,6 +61,8 @@ var Painter = new function () {
       document.getElementById('betButton').classList.add('activated');
       document.getElementById('bet-text').innerHTML = 'MATCHED';
     }
+    var el = document.getElementById('sprite' + pNum);
+    el.classList.add('raise');
   }
 
   this.animateGrantNewParticles = function (pNum, gain) {
@@ -75,6 +79,14 @@ var Painter = new function () {
       // document.getElementById('progress-bar-fill').classList.remove('reset');
       document.getElementById('progress-bar-fill').classList.add('bet-stage');
     }, 50)
+  }
+
+  this.animateResetPoses = function () {
+    for (var i = 1; i <= 8; i++) {
+      var el = document.getElementById("sprite" + i);
+      el.classList.remove('raise');
+      el.classList.remove('defend');
+    }
   }
 
   this.showBetButton = function (isAllIn) {
@@ -106,6 +118,9 @@ var Painter = new function () {
       // document.getElementById('bet-count-overlay').classList.add('count-' + betCount);
     }
     Magnetic.hiliteMagnetParticles(pNum, betSize);
+
+    var el = document.getElementById('sprite' + pNum);
+    el.classList.add('raise');
   }
 
   this.animateEnd = function (teamOneWins, teamTwoWins) {
@@ -132,18 +147,16 @@ var Painter = new function () {
   this.animateEndMatchStage = function () {
     for (var i = 1; i <= 8; i++) {
       Magnetic.transferMarkedParticles(i, 0);
+      var el = document.getElementById('sprite' + i);
+      el.classList.remove('raise');
     }
-    // for (var i = 1; i <= 8; i++) {
-    //   var el = document.getElementById('sprite' + i);
-    //   el.classList.remove(el, 'raise');
-    // }
   }
 
   this.animateFold = function (pNum) {
-    // TEST ONLY, move from here
-    this.animateRaise(pNum);
+    var el = document.getElementById('sprite' + pNum);
+    el.classList.remove('raise');
+    el.classList.add('defend');
     if (pNum == 1) {
-      // document.getElementById('defend-overlay').classList.add('defend');
       document.getElementById('foldButton').classList.add('activated');
       document.getElementById('betButton').classList.add('disabled');
     }

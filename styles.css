@@ -365,6 +365,10 @@ actual sizing seems off probably because of the borders
   z-index: 100;
 }
 
+.sprite.defend {
+  animation: none;
+}
+
 @keyframes wizidle {
    from { background-position-x:  0px; }
      to { background-position-x: -160px; }
@@ -372,7 +376,7 @@ actual sizing seems off probably because of the borders
 
 .sprite.raise {
   background: url('images/magikoopa_raise.png') left center;
-  animation: wizraise 0.7s steps(7);
+  animation: wizraise 0.25s steps(7);
   transition-property: background-position-x;
   transition-timing-function: linear;
   transition-duration: 700ms;

@@ -72,7 +72,7 @@ var Game = new function () {
     motesPerRound: 7,
     render: true,
     painter: null,
-    clock: clocks.fast,
+    clock: clocks.normal,
     newAllIns: [],
     sidePots: [],
     baseDamageMod: 5.5,
@@ -129,6 +129,7 @@ var Game = new function () {
   function advanceStage() {
     game.stage = (game.stage + 1) % 6
     if (game.stage == 0) {
+      game.painter.animateResetPoses();
       game.rounds += 1;
     }
     startStage();
