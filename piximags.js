@@ -203,8 +203,8 @@ Magnetic = new function() {
 
       var position = {
         // seems like x should vary by * 4,
-        // the same as in row styles, not sure why * 9 works
-        x: 15 + 28 - Math.floor(i / 2) * 9,
+        // the same as in row styles, not sure why * 10 works
+        x: 10 + 28 - Math.floor(i / 2) * 10,
         y: 20 + 100 + 40 * (i % 4)
         // x: ( SCREEN_WIDTH - w ) * 0.5 + (Math.random() * w), 
         // y: ( SCREEN_HEIGHT - h ) * 0.5 + (Math.random() * h)
