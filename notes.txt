@@ -51,6 +51,40 @@ At the end of the RIVER, the WARP expands (for CHOOSING)
 The WARP contracts slightly with each choosing, and then
 significantly (from 50% to 0% expanded) after the final choice
 
+====== COMPLETE ANIMATIONS AND TIMINGS
+
+Numbers are samples, replace all numbers with variables
+
+ROUND BEGINS at t = 0 (millisec)
+
+First 10,000 ms is the Bet Phase
+Next 3,000 is the Match Phase
+Next 250 is Automatch Phase
+	Wizards who have not decided automatically match/all-in
+	Play Progression 1 animation
+Next 200 is Reveal Phase
+	Next orbs are shown (200)
+
+after the River Match Phase,
+
+Next 300 is Winner Phase
+	Winning orb patterns blink highlighted
+Next 5,000 is Choice Phase
+Next 250 is Autochoice Phase
+	Wizards who have not decided automatically match/all-in
+	Play Progression 2 animation
+
+Casting phase proceeds with enough time to cast
+each spell in turn; turn order is based on Speed,
+while Wizards with the same Speed have a random order
+rerandomized each time.
+
+SPELLCASTING (per spellcast)
+
+1500 ms Spell Name (reduced to 1000 on repeats)
+250 ms - 3000 ms Spell Animation
+	includes Swipe (250 ms), Projectile(s), and Strike
 
 
-
+At the end of a match, you can select as your prize
+the wager of your opponent or of any winning gestalt.

@@ -79,6 +79,7 @@ var Game = new function () {
     players: [0, 0, 0, 0, 0, 0, 0, 0, 0],
     cards: [],
     stage: -1,
+    phase: -1,
     rounds: 0,
     captureTo: null,
     warpMotes: [],
@@ -140,13 +141,13 @@ var Game = new function () {
     game.painter = painter;
   };
 
-  function advanceStage() {
-    game.stage = (game.stage + 1) % 6
-    if (game.stage == 0) {
+  function advancePhase() {
+    game.phase = (game.phase + 1) % 6
+    if (game.phase == 0) {
       game.painter.animateResetPoses();
       game.rounds += 1;
     }
-    startStage();
+    startPhases();
   }
 
   function autoAdjustDamageMod() {
@@ -344,6 +345,15 @@ var Game = new function () {
         game.painter.faintSprite(pNum);
       }
     }
+  }
+
+  function countDeciding() {
+    var count = 0;
+    for (var i = 0; i <= 8; i++) {
+      if (isDeciding(pNum))
+        count++;
+    }
+    return count;
   }
 
   function createSidePot(requirement, outstanding) {
@@ -555,14 +565,14 @@ var Game = new function () {
       game.stage = 2; // cause advanceStage to go right to showdown
     }
 
-    advanceStage();
+    advancePhase();
   }
 
   function endSpellCasting() {
     if (detectWinCondition()) {
       endGame();
     } else {
-      advanceStage();
+      advancePhase();
     }
   }
 
@@ -571,7 +581,7 @@ var Game = new function () {
       game.painter.disableSpellButtons();
     }
     defaultSpells();
-    advanceStage();
+    advancePhase();
   }
 
   function endTransitionPhase() {
@@ -647,7 +657,39 @@ var Game = new function () {
   }
 
   function gameLoop() {
-    advanceStage();
+    game.winningTeam = undefined;
+
+    while (game.winningTeam == undefined) {
+      // stage 1: flop
+      thenTriggerByClock(revealPhaseStage1, game.clock.revealPhase);
+      thenTriggerByClock(betPhase, game.clock.betPhase);
+      thenTriggerByClock(matchPhase, game.clock.matchPhase);
+      thenTriggerByClock(collectPhase, game.clock.collectPhase);
+
+      // stage 2: turn
+      thenTriggerByClock(revealPhaseStage2, game.clock.revealPhase);
+      thenTriggerByClock(betPhase, game.clock.betPhase);
+      thenTriggerByClock(matchPhase, game.clock.matchPhase);
+      thenTriggerByClock(collectPhase, game.clock.collectPhase);
+
+      // stage 4: river
+      thenTriggerByClock(revealPhaseStage3, game.clock.revealPhase);
+      thenTriggerByClock(betPhase, game.clock.betPhase;
+      thenTriggerByClock(matchPhase, game.clock.matchPhase);
+      thenTriggerByClock(collectPhase, game.clock.collectPhase);
+
+      // stage 5: showdown
+      thenTriggerByClock(revealPhaseStage4, game.clock.revealPhase);
+      thenTriggerByClock(winnerPhase, game.clock.winnerPhase);
+
+      thenTriggerByClock(choosePhase, game.clock.choosePhase);
+      thenTriggerByClock(castPhase, game.clock.castPhase);
+
+      game.winningTeam = getWinningTeam();
+    }
+
+    thenTriggerByClock(victoryPhase, game.clock.victoryPhase);
+    thenTriggerByClock(replayPhase, game.clock.replayPhase);
   }
 
   function gamesPlayed() {
@@ -727,6 +769,10 @@ var Game = new function () {
         game.painter.setSpellButtonText(i, player.spells[i - 1]);
       }
     }
+  }
+
+  function isDeciding(pNum) {
+    return !isAllIn(pNum) && !isDefending(pNum);
   }
 
   function meet(pNum) {
@@ -1282,13 +1328,13 @@ var Game = new function () {
     // console.log("roundStartMana: " + game.roundStartMana);
   }
 
-  function startStage() {
+  function startPhases() {
     game.newAllIns.length = 0;
     game.stageStartMana = game.warpMotes.length;
 
-    report("stage", "STARTING STAGE " + game.stage);
+    report("stage", "STARTING PHASE " + game.phase);
 
-    switch (game.stage) {
+    switch (game.phase) {
       case 0:
         // flop
         startRound();
@@ -1348,7 +1394,7 @@ var Game = new function () {
         triggerByClock(endSpellCasting, game.clock.spellCasting);
       break;
       default:
-        alert("startStage encountered default");
+        alert("startPhases encountered default");
     }
   }
 
