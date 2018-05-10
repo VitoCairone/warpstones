@@ -648,7 +648,7 @@ right now these values are NOT overriden */
 #progress-bar-fill.bet-stage {
   transition-property: width;
   transition-timing-function: linear;
-  transition-duration: 10000ms;
+  transition-duration: 3500ms;
   transition-delay: 0ms;
   width: 70%;
 }
@@ -656,7 +656,7 @@ right now these values are NOT overriden */
 #progress-bar-fill.match-stage {
   transition-property: width;
   transition-timing-function: linear;
-  transition-duration: 3000ms;
+  transition-duration: 1500ms;
   width: 100%;
 }
 

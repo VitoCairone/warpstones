@@ -56,20 +56,6 @@ var Game = new function () {
       spellFlight: 0,
       showDamage: 0,
       autoRestartDelay: 0
-    },
-    slower: {
-      betStage: 10000,
-      transitionPhase: 200,
-      matchStage: 3000,
-      spellLocking: 200,
-      spellCasting: 2000,
-      manaMove: 0,
-      manaSpend: 0,
-                        // TODO: this is annoying, find a way to not have to
-                        // matchup JavaScript and CSS timings!!
-      spellFlight: 700, // note: projectile CSS animation runs in 700 ms
-      showDamage: 500, // note: damage popup CSS animation runs in 500 ms
-      autoRestartDelay: 5000
     }
   };
 
@@ -87,7 +73,7 @@ var Game = new function () {
     motesPerRound: 7,
     render: true,
     painter: null,
-    clock: clocks.slower,
+    clock: clocks.normal,
     newAllIns: [],
     sidePots: [],
     baseDamageMod: 5.5,
