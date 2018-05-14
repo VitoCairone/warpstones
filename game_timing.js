@@ -49,10 +49,6 @@ var Game = new function () {
     }
   }
 
-  // function repeatWhileNull() {
-
-  // }
-
   function gameLoop() {
 
     var p = Phases;
@@ -60,6 +56,9 @@ var Game = new function () {
     thenRunForTime(p.test, 500);
     thenRunForTime(p.test2, 1000);
     thenRunForever(p.test3);
+
+    // must call advanceQueue to run on, by pressing the Bet button
+
     thenRunForTime(p.test4, 800);
     thenRun(p.test4);
     thenRunForTime(p.test, 100);
