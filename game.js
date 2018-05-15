@@ -11,7 +11,8 @@ var Game = new function () {
     cards: [],
     warp: {
       mana: 0,
-      wager: 0
+      wager: 0,
+      priorRoundMana: 0
     }
   };
 
@@ -29,32 +30,55 @@ var Game = new function () {
   Phases.test4 = function () { console.log("test4"); }
 
   function bet(pNum) {
-    var player = game.players[pNum];
+    if (game.phase != 'bet') return;
 
-    if (player.folded || getManaCount(pNum) == 0) {
-      return 0;
+    var player = game.players[pNum];
+    if (player.folded || player.mana <= 0 || player.vote == 'raise') return;
+
+    player.vote = 'raise';
+
+    var raiseSize = getRaiseSize(pNum);
+    var raisedWager = game.previousVoteWager + raiseSize;
+    if (raisedWager > game.warp.wager) {
+      game.warp.wager = raisedWager;
     }
 
-    var wager = getRaiseSize(pNum);
+    var wager = game.warp.wager - player.wager;
+    if (wager > player.mana) wager = player.mana;
+
     player.mana -= wager;
-    game.warp.mana += 
-    player.wagerMana += wager;
+    game.warp.mana += wager;
+    player.wager += wager;
+    player.handWager += wager;
 
-    console.log("player " + pNum + " bets " + wager + " with " +  player.mana + " remaining.")
+    console.log(
+      "player " + pNum + " bets +" + wager + " (" + player.wager
+      + ") with " +  player.mana + " remaining." +
+      (player.mana == 0 ? " (all-in)" : ""))
+  }
 
-    // if (player.motes.length == 0) {
-    //   // console.log("set " + pNum + " " + player.name + " all-in @bet.");
-    //   setAllIn(pNum);
-    //   player.betCount = 7;
-    //   checkForCapture();
-    // }
+  function match(pNum) {
+    if (game.phase != 'match') return;
 
-    // if (game.render) {
-    //   var newWagerPercent = 100 * player.wager / game.roundStartMana[pNum];
-    //   game.painter.animateBet(pNum, newWagerPercent, betSize);
-    // }
+    var player = game.players[pNum];
+    if (player.folded || player.mana <= 0 || player.vote == 'match') return;
 
-    return 1;
+    player.vote = 'match';
+
+    var wager = game.warp.wager - player.wager;
+    if (wager > player.mana) wager = player.mana;
+
+    player.mana -= wager;
+    game.warp.mana += wager;
+    player.wager += wager;
+    player.handWager += wager;
+
+    console.log(
+      "player " + pNum + " matches +" + wager + " (" + player.wager
+      + ") with " +  player.mana + " remaining." + 
+      (player.mana == 0 ? " (all-in)" : "")
+    )
+
   }
 
   function getManaCount(n) {
@@ -65,6 +89,13 @@ var Game = new function () {
     game.clockMs = 0; // note: only approximates wall time
     window.setInterval(function () {
       game.clockMs += 30;
+
+      // AI press buttons at random
+      if (Math.random() < 0.1) {
+        var pNum = 1 + Math.floor(Math.random() * 8);
+        bet(pNum);
+      }
+
       // todo: don't do this sort here, do it on-modify instead
       game.runQ.sort(function(a, b) { return a[1] - b[1] });
       while (game.runQ.length > 0 && game.runQ[0][1] <= game.clockMs) {
@@ -85,6 +116,10 @@ var Game = new function () {
   }
 
   function revealOrbs1() {
+    shuffleCards();
+    for (var i = 1; i <= 8; i++) {
+      game.players[i].handWager = 0;
+    }
     console.log("Your orbs are " + game.cards[5] + " and " + game.cards[6]);
     console.log("Flop orbs are " + game.cards[0] + " and " + game.cards[1]);
     game.runQ.push([betPhase, game.clockMs + 300]);
@@ -107,14 +142,18 @@ var Game = new function () {
 
   function betPhaseDeadline() {
     if (game.phase != 'bet') return;
-    game.runQ.push([matchPhase, game.clockMs]);
+    endBetPhase();
   }
 
   function betPhase() {
+    game.warp.priorRoundMana = game.warp.mana;
+    game.warp.wager = 0;
+    game.previousVoteWager = 0;
     game.phase = 'bet';
     game.voteRoundsLeft = 7
     for (var i = 1; i <= 8; i++) {
       game.players[i].betPhaseStartMana = getManaCount(i);
+      game.players[i].wager = 0;
     }
     game.runQ.push([nextVote, game.clockMs +     10000 / 7]);
     game.runQ.push([nextVote, game.clockMs + 2 * 10000 / 7]);
@@ -123,13 +162,48 @@ var Game = new function () {
     game.runQ.push([nextVote, game.clockMs + 5 * 10000 / 7]);
     game.runQ.push([nextVote, game.clockMs + 6 * 10000 / 7]);
     game.runQ.push([betPhaseDeadline, game.clockMs + 10000]);
+    for (var i = 1; i <= 8; i++) game.players[i].vote = 'undecided';
     console.log("7 votes left");
+  }
+
+  function endBetPhase() {
+    game.phase = 'match';
+    game.runQ.push([matchPhase, game.clockMs]);
+  }
+
+  function endMatchPhase() {
+    game.phase = 'transfer';
+    game.runQ.push([transferPhase, game.clockMs]);
+  }
+
+  function transferPhase() {
+    var newMana = game.warp.mana - game.warp.priorRoundMana;
+    console.log("Warp gained " + newMana + " mana (now has " + game.warp.mana + ")");
+    game.runQ.push([nextRevealPhase, game.clockMs + 300]);
+  }
+
+  function countMagesRaising() {
+    //console.log(game.players);
+    var count = 0;
+    for (var i = 1; i <= 8; i++)
+      if (game.players[i].vote == 'raise')
+        count++;
+    return count;
   }
 
   function nextVote() {
     if (game.phase != 'bet') return;
-    game.voteRoundsLeft -= 1;
-    console.log(game.voteRoundsLeft + " votes left");
+
+    var magesRaising = countMagesRaising();
+    for (var i = 1; i <= 8; i++) game.players[i].vote = 'undecided';
+    console.log(magesRaising + " mages raised. Wager is at " + game.warp.wager)
+    if (magesRaising < 2) {
+      endBetPhase();
+    } else {
+      game.previousVoteWager = game.warp.wager;
+      game.voteRoundsLeft -= 1;
+      console.log(game.voteRoundsLeft + " votes left");
+    }
   }
 
   function nextRevealPhase() {
@@ -156,17 +230,19 @@ var Game = new function () {
   }
 
   function getRaiseSize(n) {
-    if (game.voteRoundsLeft == 1) {
-      return getManaCount(i);
-    } else {
-      return Math.floor(getManaCount(i) / game.voteRoundsLeft);
-    }
-    
+      var mana = getManaCount(n);
+      var size = Math.floor(mana / game.voteRoundsLeft);
+      if (size < 1 && mana > 0) return 1;
+      return size;
   }
 
   function matchPhaseDeadline() {
     if (game.phase != 'match') return;
-    game.runQ.push([nextRevealPhase, game.clockMs]);
+    for (var i = 1; i <= 8; i++) {
+      if (game.players[i].vote == 'undecided')
+        match(i);
+    }
+    endMatchPhase();
   }
 
   function matchPhase() {
@@ -187,7 +263,7 @@ var Game = new function () {
 
     var k = 0;
     for (i = array.length - 1; i > 0; i -= 1) {
-      j = Math.floor(MT.random() * (i + 1));
+      j = Math.floor(Math.random() * (i + 1));
       temp = array[i]
       array[i] = array[j]
       array[j] = temp
@@ -208,7 +284,9 @@ var Game = new function () {
     }
     for (var i = 1; i <= 8; i++) {
       game.players[i].mana = 5;
+      game.players[i].wager = 0;
       game.players[i].folded = false;
+      game.players[i].vote = undefined;
     }
     game.cards = game.cards.concat(["void", "void", "spirit"]);
     gameLoop();
