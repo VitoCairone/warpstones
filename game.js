@@ -20,10 +20,6 @@ var Game = new function () {
 
   var Players = {};
 
-  Players.allDecided = function () {
-    return true;
-  }
-
   Phases.test = function () { console.log("test"); }
   Phases.test2 = function () { console.log("test2"); }
   Phases.test3 = function () { console.log("test3"); }
@@ -55,6 +51,186 @@ var Game = new function () {
       "player " + pNum + " bets +" + wager + " (" + player.wager
       + ") with " +  player.mana + " remaining." +
       (player.mana == 0 ? " (all-in)" : ""))
+  }
+
+  function allDecided () {
+    for (var i = 1; i <= 8; i++) 
+      if (isDeciding(i)) return false;
+    return true;
+  }
+
+  function isDeciding(pNum) {
+    return game.players[pNum].vote == 'undecided';
+  }
+
+  function calcGestaltData(gestalt, findFormula) {
+    if (typeof findFormula === 'undefined') {
+      findFormula = true;
+    }
+
+    var score = 0;
+    var formula = "";
+    var hashEls = {};
+
+    for (var i = 0; i < gestalt.length; i++) {
+      var el = gestalt[i];
+      if (el in hashEls) {
+        hashEls[el] += 1;
+      } else {
+        hashEls[el] = 1;
+      }
+    }
+
+    var presentEls = Object.keys(hashEls);
+
+    presentEls.sort(function (a, b) {
+      return hashEls[b] - hashEls[a];
+    })
+
+    if (findFormula) {
+      var innerForm = [];
+      for (var i = 0; i < presentEls.length; i++) {
+        var el = presentEls[i];
+        if (hashEls[el] < 2) {
+          break;
+        }
+        innerForm.push(el.charAt(0) + hashEls[el]);
+      }
+      if (innerForm.length == 0) {
+        formula = 'x';
+      } else {
+        formula = innerForm.join(' ');
+      }
+    }
+
+    countsArr = [0, 0, 0, 0, 0, 0, 0, 0];
+    for (var i = 0; i < presentEls.length; i++) {
+      var el = presentEls[i];
+      countsArr[hashEls[el]] += 1;
+    }
+
+    var pow10 = 1;
+    for (var i = 1; i <= 7; i++) {
+      var multiple = countsArr[i];
+      score += multiple * pow10;
+      pow10 *= 10;
+    }
+
+    if ("spirit" in hashEls) {
+      score += 1;
+      formula = formula + " +S"
+    }
+
+    if ("void" in hashEls && hashEls["void"] == 2) {
+      formula = "0 " + formula;
+      score += 1000000000;
+    }
+
+    return {
+      formula: formula,
+      score: score
+    };
+  }
+
+  function getCommonCards() {
+    return game.cards.slice(0, 5);
+  }
+
+  function getPlayerCards(pNum) {
+    var idx = pNum - 1;
+    return [game.cards[idx * 2 + 5], game.cards[idx * 2 + 6]];
+  }
+
+  function setGestaltRanks() {
+    for (var i = 1; i <= 8; i++) {
+      // skip folded players because they are never eligible,
+      // even for side pots
+      if (game.players[i].folded) continue;
+
+      var player = game.players[i];
+      var gestalt = getCommonCards().concat(getPlayerCards(i));
+      var gestalted = calcGestaltData(gestalt);
+      var score = gestalted.score;
+
+      player.gestalt = gestalt;
+      player.gestaltRank = gestalted.score;
+      player.gestaltFormula = gestalted.formula;
+
+      if (true) { // printing all gestalts
+        var shortHand = [];
+        for (var j = 0; j < gestalt.length; j++) {
+          shortHand.push(gestalt[j].charAt(0).toUpperCase())
+        }
+        console.log("Player " + i + " has " + shortHand.join('') + " worth " + score);
+      }
+    }
+  }
+
+  function findWinners(eligible) {
+    if (eligible.length == 0) {
+      alert("ERROR: no eligible players in findWinners");
+      return [];
+    }
+
+    var pNum = null;
+    var score = 0;
+    var topScore = 0;
+    var topScoreNums = [];
+
+    for (var i = 0; i < eligible.length; i++) {
+      pNum = eligible[i];
+
+      if (game.players[pNum].folded) {
+        continue;
+      }
+
+      score = game.players[pNum].gestaltRank;
+      if (score > topScore) {
+        topScore = score;
+        topScoreNums = [pNum];
+      } else if (score == topScore) {
+        topScoreNums.push(pNum);
+      }
+    }
+
+    if (topScore === 0) {
+      alert("ERROR: all eligible players have folded in findWinners");
+    }
+
+    return topScoreNums;
+  }
+
+  function sendManaToWinners() {
+    var winnings = [null, 0, 0, 0, 0, 0, 0, 0, 0];
+    var pNum = null;
+    var amount = 0;
+
+    setGestaltRanks();
+
+    var winners = findWinners([1,2,3,4,5,6,7,8]);
+
+    amount = Math.floor(game.warp.mana / winners.length);
+
+    for (var i = 0; i < winners.length; i++) {
+      pNum = winners[i];
+      winnings[pNum] += amount;
+      game.players[pNum].mana += amount;
+      game.warp.mana -= amount;
+    }
+
+    if (game.warp.amount > 0) {
+      shuffle(winners);
+      while (game.warp.amount > 0) {
+        pNum = winners[i];
+        winnings[pNum] += 1;
+        game.players[pNum].mana += 1;
+        game.warp.mana -= 1;
+      }
+    }
+
+    for (var i = 0; i < winners.length; i++) {
+      console.log("Player " + winners[i] + " won " + winnings[winners[i]] + " mana.")
+    }
   }
 
   function match(pNum) {
@@ -136,7 +312,11 @@ var Game = new function () {
   }
 
   function revealWinner() {
-    console.log("Winner is player " + (1 + Math.floor(Math.random() * 8)));
+    // ignoring side pots right now, findWinners will discard folded wizards
+    // setGestaltRanks();
+    // var winners = findWinners([1,2,3,4,5,6,7,8]);
+    // console.log("Winners are players " + winners);
+    sendManaToWinners();
     game.runQ.push([nextRevealPhase, game.clockMs + 300]);
   }
 
@@ -195,7 +375,16 @@ var Game = new function () {
     if (game.phase != 'bet') return;
 
     var magesRaising = countMagesRaising();
-    for (var i = 1; i <= 8; i++) game.players[i].vote = 'undecided';
+    for (var i = 1; i <= 8; i++) {
+      var player = game.players[i];
+      if (player.mana <= 0) {
+        player.vote = 'all-in';
+      } else if (player.folded) {
+        player.vote = 'defend'
+      } else  {
+        player.vote = 'undecided';
+      }
+    }
     console.log(magesRaising + " mages raised. Wager is at " + game.warp.wager)
     if (magesRaising < 2) {
       endBetPhase();
